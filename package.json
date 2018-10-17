@@ -2,16 +2,18 @@
   "name": "forevents",
   "version": "1.0.0",
   "description": "API REST Node ForEvents Project",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./bin/www"
   },
   "author": "4EverYoung",
   "license": "ISC",
   "dependencies": {
     "ejs": "^2.6.1",
     "express": "^4.16.4",
+    "hash.js": "^1.1.5",
+    "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.3.4",
-    "nodemon": "^1.18.4"
+    "nodemon": "^1.18.4",
+    "validator": "^10.8.0"
   }
 }
