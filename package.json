@@ -1,0 +1,11 @@
+{
+  "name": "forevents",
+  "version": "1.0.0",
+  "description": "API REST Node ForEvents Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "4EverYoung",
+  "license": "ISC"
+}
