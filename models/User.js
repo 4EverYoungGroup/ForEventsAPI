@@ -20,47 +20,47 @@ userSchema.statics.exists = function (idUser, cb) {
     });
 };
 
-userSchema.statics.createRecord = function (nuevo, cb) {
-    /*     // validaciones
-        const valErrors = [];
-        if (!(v.isAlpha(nuevo.nombre) && v.isLength(nuevo.nombre, 2))) {
-            valErrors.push({ field: 'nombre', message: __('validation_invalid', { field: 'nombre' }) });
+userSchema.statics.createRecord = function (newUser, cb) {
+    // Validations
+    const valErrors = [];
+    if (!(v.isAlpha(newUser.firstName) && v.isLength(newUser.firstName, 2))) {
+        valErrors.push({ field: 'firstName', message: __('validation_invalid', { field: 'firstName' }) });
+    }
+
+    if (!v.isEmail(newUser.email)) {
+        valErrors.push({ field: 'email', message: __('validation_invalid', { field: 'email' }) });
+    }
+
+    if (!v.isLength(newUser.password, 6)) {
+        valErrors.push({ field: 'password', message: __('validation_minchars', { num: '6' }) });
+    }
+
+    if (valErrors.length > 0) {
+        return cb({ code: 422, errors: valErrors });
+    }
+
+    // Verify duplicates
+    // Find user
+    Usuario.findOne({ email: newUser.email }, function (err, user) {
+        if (err) {
+            return cb(err);
         }
-    
-        if (!v.isEmail(nuevo.email)) {
-            valErrors.push({ field: 'email', message: __('validation_invalid', { field: 'email' }) });
+
+        // user already exists
+        if (user) {
+            return cb({ code: 409, message: __('user_email_duplicated') });
+        } else {
+
+            // Calculate hash of paswword to save in database
+            let hashedPassword = hash.sha256().update(newUser.password).digest('hex');
+
+            newUser.password = hashedPassword;
+
+            // creo el usuario
+            new User(newUser).save(cb);
         }
-    
-        if (!v.isLength(nuevo.clave, 6)) {
-            valErrors.push({ field: 'clave', message: __('validation_minchars', { num: '6' }) });
-        }
-    
-        if (valErrors.length > 0) {
-            return cb({ code: 422, errors: valErrors });
-        }
-    
-        // comprobar duplicados
-        // buscar el usuario
-        Usuario.findOne({ email: nuevo.email }, function (err, user) {
-            if (err) {
-                return cb(err);
-            }
-    
-            // el usuario ya existía
-            if (user) {
-                return cb({ code: 409, message: __('user_email_duplicated') });
-            } else {
-    
-                // Hago hash de la password
-                let hashedClave = hash.sha256().update(nuevo.clave).digest('hex');
-    
-                nuevo.clave = hashedClave;
-    
-                // creo el usuario
-                new Usuario(nuevo).save(cb);
-            }
-        });
-     */
+    });
+
 };
 
 var User = mongoose.model('User', userSchema);
