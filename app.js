@@ -3,9 +3,9 @@
 
 const express = require('express');
 const path = require('path');
-//const logger = require('morgan');
-//const cookieParser = require('cookie-parser');
-//const bodyParser = require('body-parser');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 //const i18n = require('i18n');
 
 /* jshint ignore:start */
@@ -21,10 +21,10 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-//app.use(logger('dev'));
-//app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({ extended: false }));
-//app.use(cookieParser());
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // languages registration
@@ -75,7 +75,7 @@ if (app.get('env') === 'development') {
 app.use(function (err, req, res, next) {
     if (err.status && err.status >= 500) console.error(err);
     res.status(err.status || err.code || 500);
-    if (isAPI(req)) { // llamada de API, devuelvo JSON
+    if (isAPI(req)) { // API call? return JSON
         return res.json({
             ok: false,
             error: { code: err.code || err.status || 500, message: err.message, err: {} }

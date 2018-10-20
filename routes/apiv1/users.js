@@ -11,7 +11,6 @@ const config = require('../../local_config');
 const hash = require('hash.js');
 
 router.post('/authenticate', function (req, res, next) {
-
     const email = req.body.email;
     const password = req.body.password;
 
@@ -23,7 +22,7 @@ router.post('/authenticate', function (req, res, next) {
             return res.json({
                 ok: false, error: {
                     code: 401,
-                    message: res.__('users_user_not_found')
+                    message: 'user_not_found'
                 }
             });
         } else if (user) {
@@ -37,7 +36,7 @@ router.post('/authenticate', function (req, res, next) {
                 return res.json({
                     ok: false, error: {
                         code: 401,
-                        message: res.__('users_wrong_password')
+                        message: 'user_wrong_password'
                     }
                 });
             } else {
@@ -56,10 +55,11 @@ router.post('/authenticate', function (req, res, next) {
 
 router.post('/register', function (req, res, next) {
     User.createRecord(req.body, function (err) {
+
         if (err) return next(err);
 
         // user created
-        return res.json({ ok: true, message: res.__('users_user_created') });
+        return res.json({ ok: true, message: 'user_created' });
     });
 });
 
