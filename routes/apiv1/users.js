@@ -19,9 +19,8 @@ router.post('/authenticate', function (req, res, next) {
         if (err) return next(err);
 
         if (!user) {
-            return res.json({
+            return res.json(400, {
                 ok: false, error: {
-                    code: 401,
                     message: 'user_not_found'
                 }
             });
@@ -33,9 +32,8 @@ router.post('/authenticate', function (req, res, next) {
             // compare passwords
             if (user.password != passHash) {
                 //hashes not equal
-                return res.json({
+                return res.json(400, {
                     ok: false, error: {
-                        code: 401,
                         message: 'user_wrong_password'
                     }
                 });
@@ -59,7 +57,7 @@ router.post('/register', function (req, res, next) {
         if (err) return next(err);
 
         // user created
-        return res.json({ ok: true, message: 'user_created' });
+        return res.json(201, { ok: true, message: 'user_created', user: req.body });
     });
 });
 

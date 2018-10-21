@@ -78,7 +78,7 @@ app.use(function (err, req, res, next) {
     if (isAPI(req)) { // API call? return JSON
         return res.json({
             ok: false,
-            error: { code: err.code || err.status || 500, message: err.message, err: {} }
+            error: { message: err.message, err: {} }
         });
     }
 
