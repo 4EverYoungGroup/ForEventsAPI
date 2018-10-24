@@ -104,4 +104,56 @@ userSchema.statics.deleteRecord = function (req, cb) {
     //TODO: Delete Favourite_searches
 }
 
+
+userSchema.statics.updateRecord = function (req, cb) {
+
+    // Validations
+    const valErrors = [];
+    if (req.body.firstName && !(v.isAlpha(req.body.firstName) && v.isLength(req.body.firstName, 2))) {
+        valErrors.push({ field: 'firstName', message: 'validation_invalid_firstName' });
+    }
+
+    //format email is valid
+    if (!v.isEmail(req.body.email)) {
+        valErrors.push({ field: 'email', message: 'validation_invalid_email' });
+    }
+
+
+    //control restrictions passwor, must include 1 letter uppercase, 1 letter lowercase and 1 digit 
+    if (req.body.password && !passwordSchema.validate(req.body.password)) {
+        valErrors.push({ field: 'password', message: 'password_not_valid_must_include_uppercase_lowercase_digits' });
+    }
+
+    if (valErrors.length > 0) {
+        return cb({ code: 400, errors: valErrors });
+    }
+
+    // Find user
+    User.findOne({ email: req.decoded.user.email }, function (err, UpdatedUser) {
+
+        if (err) {
+            return cb({ code: 500, message: 'error_accesing_data' });
+        }
+
+        if (!UpdatedUser) {
+            return cb({ code: 404, message: 'user_not_exist' });
+        }
+        else {
+            UpdatedUser.email = req.body.email;
+            UpdatedUser.firstName = req.body.firstName;
+            UpdatedUser.lastName = req.body.lastName;
+
+            // Calculate hash of paswword to save in database
+            if (req.body.password) {
+                let hashedPassword = hash.sha256().update(req.body.password).digest('hex');
+                UpdatedUser.password = hashedPassword;
+            }
+
+            //update user
+            UpdatedUser.save(cb);
+        }
+    });
+
+};
+
 var User = mongoose.model('User', userSchema);

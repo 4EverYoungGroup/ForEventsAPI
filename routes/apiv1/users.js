@@ -77,6 +77,16 @@ router.delete('/:user_id', function (req, res, next) {
     });
 });
 
+router.put('/:user_id', function (req, res, next) {
+
+    User.updateRecord(req, function (err) {
+        if (err) {
+            return res.json(err);
+        }
+        //user deleted
+        return res.status(200).json({ ok: true, message: 'user_updated', user: req.body });
+    });
+});
 
 
 module.exports = router;
