@@ -10,7 +10,9 @@ const jwt = require('jsonwebtoken');
 const config = require('../../local_config');
 const hash = require('hash.js');
 
-router.post('/authenticate', function (req, res, next) {
+const jwtAuth = require('../../lib/jwtAuth');
+
+router.post('/login', function (req, res, next) {
     const email = req.body.email;
     const password = req.body.password;
 
@@ -60,5 +62,21 @@ router.post('/register', function (req, res, next) {
         return res.json(201, { ok: true, message: 'user_created', user: req.body });
     });
 });
+
+//Auth with JWT
+
+router.use(jwtAuth());
+
+router.delete('/:user_id', function (req, res, next) {
+    User.deleteRecord(req, function (err) {
+        if (err) {
+            return res.json(err);
+        }
+        //user deleted
+        return res.status(204).json({ ok: true, message: 'user_deleted' });
+    });
+});
+
+
 
 module.exports = router;

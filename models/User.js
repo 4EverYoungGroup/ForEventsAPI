@@ -76,4 +76,32 @@ userSchema.statics.createRecord = function (newUser, cb) {
 
 };
 
+userSchema.statics.deleteRecord = function (req, cb) {
+    console.log('req.params._id: ' + req.params.user_id + ' req.decoded._id: ' + req.decoded.user._id);
+    console.log(req.decoded.user.email);
+    if (req.params.user_id != req.decoded.user._id) {
+        return cb({ code: 403, message: 'action_not_allowed_credentials_error' })
+
+    }
+    //TODO: Validate admin user to allow acciont
+
+
+    User.findOne({ email: req.decoded.user.email }, function (err, DeletedUser) {
+        if (err) {
+            return cb({ code: 500, message: 'error_accesing_data' });
+        }
+
+        if (!DeletedUser) {
+            return cb({ code: 404, message: 'user_not_exists' })
+        }
+        else {
+            DeletedUser.remove(cb);
+        }
+    })
+
+    //TODO: Delete events associated
+
+    //TODO: Delete Favourite_searches
+}
+
 var User = mongoose.model('User', userSchema);
