@@ -155,4 +155,32 @@ userSchema.statics.updateRecord = function (req, cb) {
     });
 };
 
+userSchema.statics.getRecord = function (req, cb) {
+
+    if (req.params.user_id != req.decoded.user._id) {
+        return cb({ code: 403, message: 'action_not_allowed_credentials_error' })
+    }
+
+    User.findOne({ _id: req.params.user_id }, function (err, User) {
+        if (err) {
+            return cb({ code: 500, message: 'error_accesing_data' });
+        }
+
+        if (!User) {
+            return cb({ code: 404, message: 'user_not_exists' })
+        }
+        else {
+            if (req.params.user_id != req.decoded.user._id) {
+                //restricted access to data of user
+                delete User.password //delete password of the json returned
+                return cb(User)
+            } else {
+                //unrestricted access to data of user
+                return cb(User)
+            }
+
+        }
+    })
+}
+
 var User = mongoose.model('User', userSchema);

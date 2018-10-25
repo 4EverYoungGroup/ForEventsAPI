@@ -14,6 +14,8 @@ const nodemailer = require('nodemailer')
 
 const jwtAuth = require('../../lib/jwtAuth');
 
+const constants = require('../../commons/constants')
+
 router.post('/login', function (req, res, next) {
     const email = req.body.email;
     const password = req.body.password;
@@ -64,7 +66,6 @@ router.post('/register', function (req, res, next) {
         return res.json(201, { ok: true, message: 'user_created', user: req.body });
     });
 });
-
 
 router.post('/recover', function (req, res, next) {
 
@@ -129,6 +130,16 @@ router.put('/:user_id', function (req, res, next) {
         }
         //user deleted
         return res.status(200).json({ ok: true, message: 'user_updated', user: req.body });
+    });
+});
+
+router.get('/:user_id', function (req, res, next) {
+    User.getRecord(req, function (err, result) {
+        if (err) {
+            return res.json(err);
+        }
+        //user deleted
+        return res.status(200).json({ ok: true, message: 'user_info', user: result });
     });
 });
 
