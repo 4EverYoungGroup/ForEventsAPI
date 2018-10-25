@@ -1,7 +1,7 @@
-const SMTP_HOST = 'correo.telefonica.net'
+const SMTP_HOST = 'configureyourserver.com'
 const SMTP_PORT = 25
-const SMTP_USER = 'afernandezgr@telefonica.net'
-const SMTP_PASS = 'cadena3'
+const SMTP_USER = 'user@domain.com'
+const SMTP_PASS = 'your_password'
 const SMTP_SECURE = false
 
 module.exports = {
