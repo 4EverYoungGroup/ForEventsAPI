@@ -153,7 +153,6 @@ userSchema.statics.updateRecord = function (req, cb) {
             UpdatedUser.save(cb);
         }
     });
-
 };
 
 var User = mongoose.model('User', userSchema);

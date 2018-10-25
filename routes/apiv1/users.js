@@ -10,6 +10,8 @@ const jwt = require('jsonwebtoken');
 const config = require('../../local_config');
 const hash = require('hash.js');
 
+const nodemailer = require('nodemailer')
+
 const jwtAuth = require('../../lib/jwtAuth');
 
 router.post('/login', function (req, res, next) {
@@ -61,6 +63,48 @@ router.post('/register', function (req, res, next) {
         // user created
         return res.json(201, { ok: true, message: 'user_created', user: req.body });
     });
+});
+
+
+router.post('/recover', function (req, res, next) {
+
+    User.findOne({ email: req.body.email }, function (err, userData) {
+        if (err) {
+            return res.status(500).json({ ok: false, code: 5000, message: 'error_accesing_data' });
+        }
+        if (!userData) {
+            return res.status(404).json({ ok: false, code: 404, message: 'user_not_exist' });
+        }
+        else {
+            const transporter = nodemailer.createTransport({
+                host: constants.SMTP_HOST,
+                port: constants.SMTP_PORT,
+                secure: constants.SMTP_SECURE,
+                auth: {
+                    user: constants.SMTP_USER,
+                    pass: constants.SMPT_PASS
+                }
+            })
+
+
+            // setup e-mail data with unicode symbols
+            const mailOptions = {
+                from: '"4Events recover pass" <no-reply@4event.net>', // sender address
+                to: req.body.email, // list of receivers
+                subject: 'Recover pass 4Events', // Subject line
+                text: 'Recover password click this link ...', // plaintext body
+                html: '<b>Please click this <a href="">link</a> to recover password</b>' // html body
+            };
+
+            // send mail with defined transport object
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    return res.status(400).json({ ok: false, message: error.message })
+                }
+                return res.status(400).json({ ok: true, message: 'recover-message-sent' })
+            });
+        }
+    })
 });
 
 //Auth with JWT
