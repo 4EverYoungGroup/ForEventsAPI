@@ -58,12 +58,12 @@ router.post('/login', function (req, res, next) {
 });
 
 router.post('/register', function (req, res, next) {
-    User.createRecord(req.body, function (err) {
+    User.createRecord(req.body, function (err, result) {
 
-        if (err) return next(err);
+        if (err) return res.status(400).json(err);
 
         // user created
-        return res.json(201, { ok: true, message: 'user_created', user: req.body });
+        return res.json(201, { ok: true, message: 'user_created', user: result });
     });
 });
 

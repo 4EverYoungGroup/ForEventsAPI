@@ -62,7 +62,7 @@ userSchema.statics.createRecord = function (newUser, cb) {
 
         // user already exists
         if (user) {
-            return cb({ code: 400, message: 'user_email_duplicated' });
+            return cb({ ok: false, message: 'user_email_duplicated' });
         } else {
 
             // Calculate hash of paswword to save in database
@@ -70,7 +70,8 @@ userSchema.statics.createRecord = function (newUser, cb) {
             newUser.password = hashedPassword;
 
             // Create user
-            new User(newUser).save(cb);
+            new User(newUser).save();
+            return cb(null, newUser);
         }
     });
 
