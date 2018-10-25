@@ -48,7 +48,7 @@ userSchema.statics.createRecord = function (newUser, cb) {
     }
 
     if (valErrors.length > 0) {
-        return cb({ code: 400, errors: valErrors });
+        return cb({ ok: false, errors: valErrors });
     }
 
 
@@ -81,7 +81,7 @@ userSchema.statics.deleteRecord = function (req, cb) {
     console.log('req.params._id: ' + req.params.user_id + ' req.decoded._id: ' + req.decoded.user._id);
     console.log(req.decoded.user.email);
     if (req.params.user_id != req.decoded.user._id) {
-        return cb({ code: 403, message: 'action_not_allowed_credentials_error' })
+        return cb({ code: 403, ok: false, message: 'action_not_allowed_credentials_error' })
 
     }
     //TODO: Validate admin user to allow acciont
@@ -89,11 +89,11 @@ userSchema.statics.deleteRecord = function (req, cb) {
 
     User.findOne({ email: req.decoded.user.email }, function (err, DeletedUser) {
         if (err) {
-            return cb({ code: 500, message: 'error_accesing_data' });
+            return cb({ code: 500, ok: false, message: 'error_accesing_data' });
         }
 
         if (!DeletedUser) {
-            return cb({ code: 404, message: 'user_not_exists' })
+            return cb({ code: 404, ok: false, message: 'user_not_exists' })
         }
         else {
             DeletedUser.remove(cb);
@@ -104,7 +104,6 @@ userSchema.statics.deleteRecord = function (req, cb) {
 
     //TODO: Delete Favourite_searches
 }
-
 
 userSchema.statics.updateRecord = function (req, cb) {
 
@@ -126,18 +125,18 @@ userSchema.statics.updateRecord = function (req, cb) {
     }
 
     if (valErrors.length > 0) {
-        return cb({ code: 400, errors: valErrors });
+        return cb({ code: 400, ok: false, errors: valErrors });
     }
 
     // Find user
     User.findOne({ email: req.decoded.user.email }, function (err, UpdatedUser) {
 
         if (err) {
-            return cb({ code: 500, message: 'error_accesing_data' });
+            return cb({ code: 500, ok: false, message: 'error_accesing_data' });
         }
 
         if (!UpdatedUser) {
-            return cb({ code: 404, message: 'user_not_exist' });
+            return cb({ code: 404, ok: false, message: 'user_not_exist' });
         }
         else {
             UpdatedUser.email = req.body.email;
@@ -158,30 +157,31 @@ userSchema.statics.updateRecord = function (req, cb) {
 
 userSchema.statics.getRecord = function (req, cb) {
 
-    if (req.params.user_id != req.decoded.user._id) {
-        return cb({ code: 403, message: 'action_not_allowed_credentials_error' })
-    }
+    //if (req.params.user_id != req.decoded.user._id){
+    //    return cb({ code: 403 , message: 'action_not_allowed_credentials_error'})      
+    //}
 
-    User.findOne({ _id: req.params.user_id }, function (err, User) {
+    User.findOne({ _id: req.params.user_id }, function (err, userDB) {
         if (err) {
-            return cb({ code: 500, message: 'error_accesing_data' });
+            return cb({ code: 500, ok: false, message: 'error_accesing_data' });
         }
 
-        if (!User) {
-            return cb({ code: 404, message: 'user_not_exists' })
+        if (!userDB) {
+            return cb({ code: 404, ok: false, message: 'user_not_exists' })
         }
         else {
+            //console.log('requ.params.user_id: ' + req.params.user_id + ' req.decoded.user._id: ' + req.decoded.user._id)
             if (req.params.user_id != req.decoded.user._id) {
-                //restricted access to data of user
-                delete User.password //delete password of the json returned
-                return cb(User)
+                //restricted access to data of user , password is not available
+                //TODO avoid initialization to '', delete of the propertie, delete not running well
+                userDB.password = ''
+                return cb(null, userDB)
             } else {
                 //unrestricted access to data of user
-                return cb(User)
+                return cb(null, userDB)
             }
-
         }
     })
-}
 
+}
 var User = mongoose.model('User', userSchema);

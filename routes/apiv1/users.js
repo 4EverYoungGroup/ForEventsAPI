@@ -25,7 +25,7 @@ router.post('/login', function (req, res, next) {
         if (err) return next(err);
 
         if (!user) {
-            return res.json(400, {
+            return res.status(400).json({
                 ok: false, error: {
                     message: 'user_not_found'
                 }
@@ -38,13 +38,12 @@ router.post('/login', function (req, res, next) {
             // compare passwords
             if (user.password != passHash) {
                 //hashes not equal
-                return res.json(400, {
+                return res.status(400).json({
                     ok: false, error: {
                         message: 'user_wrong_password'
                     }
                 });
             } else {
-
                 // user found and hash is equal
                 // generate token
                 const token = jwt.sign({ user: user }, config.jwt.secret, config.jwt.options);
@@ -63,7 +62,7 @@ router.post('/register', function (req, res, next) {
         if (err) return res.status(400).json(err);
 
         // user created
-        return res.json(201, { ok: true, message: 'user_created', user: result });
+        return res.status(201).json({ ok: true, message: 'user_created', user: result });
     });
 });
 
@@ -71,7 +70,7 @@ router.post('/recover', function (req, res, next) {
 
     User.findOne({ email: req.body.email }, function (err, userData) {
         if (err) {
-            return res.status(500).json({ ok: false, code: 5000, message: 'error_accesing_data' });
+            return res.status(500).json({ ok: false, code: 500, message: 'error_accesing_data' });
         }
         if (!userData) {
             return res.status(404).json({ ok: false, code: 404, message: 'user_not_exist' });
@@ -115,7 +114,7 @@ router.use(jwtAuth());
 router.delete('/:user_id', function (req, res, next) {
     User.deleteRecord(req, function (err) {
         if (err) {
-            return res.json(err);
+            return res.status(err.code).json({ ok: err.ok, message: err.message });
         }
         //user deleted
         return res.status(204).json({ ok: true, message: 'user_deleted' });
@@ -136,7 +135,7 @@ router.put('/:user_id', function (req, res, next) {
 router.get('/:user_id', function (req, res, next) {
     User.getRecord(req, function (err, result) {
         if (err) {
-            return res.json(err);
+            return res.status(err.code).json({ ok: err.ok, message: err.message });
         }
         //user deleted
         return res.status(200).json({ ok: true, message: 'user_info', user: result });
