@@ -80,9 +80,7 @@ router.post('/login', function (req, res, next) {
             if (user.password != passHash) {
                 //hashes not equal
                 return res.status(400).json({
-                    ok: false, error: {
-                        message: 'user_wrong_password'
-                    }
+                    ok: false, message: 'user_wrong_password'
                 });
             } else {
                 // user found and hash is equal
