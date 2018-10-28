@@ -194,11 +194,10 @@ router.post('/recover', function (req, res, next) {
                 secure: constants.SMTP_SECURE,
                 auth: {
                     user: constants.SMTP_USER,
-                    pass: constants.SMPT_PASS
+                    pass: constants.SMTP_PASS
                 }
             })
-
-
+            console.log(transporter)
             // setup e-mail data with unicode symbols
             const mailOptions = {
                 from: '"4Events recover pass" <no-reply@4event.net>', // sender address
@@ -213,7 +212,7 @@ router.post('/recover', function (req, res, next) {
                 if (error) {
                     return res.status(400).json({ ok: false, message: error.message })
                 }
-                return res.status(400).json({ ok: true, message: 'recover-message-sent' })
+                return res.status(200).json({ ok: true, message: 'recover-message-sent' })
             });
         }
     })
