@@ -1,8 +1,8 @@
-const SMTP_HOST = 'configureyourserver.com'
-const SMTP_PORT = 25
-const SMTP_USER = 'user@domain.com'
-const SMTP_PASS = 'your_password'
-const SMTP_SECURE = false
+const SMTP_HOST = 'smtp.gmail.com'
+const SMTP_PORT = 465
+const SMTP_USER = '4everyoung@gmail.com'
+const SMTP_PASS = '4everyoung.group'
+const SMTP_SECURE = true
 
 module.exports = {
     SMTP_HOST: SMTP_HOST,
