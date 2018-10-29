@@ -93,7 +93,7 @@ userSchema.statics.deleteRecord = function (req, cb) {
         }
 
         if (!DeletedUser) {
-            return cb({ code: 404, ok: false, message: 'user_not_exists' })
+            return cb({ code: 404, ok: false, message: 'email_not_exist' })
         }
         else {
             DeletedUser.remove(cb);
@@ -129,28 +129,29 @@ userSchema.statics.updateRecord = function (req, cb) {
     }
 
     // Find user
-    User.findOne({ email: req.decoded.user.email }, function (err, UpdatedUser) {
+    User.findOne({ email: req.decoded.user.email }, function (err, updatedUser) {
 
         if (err) {
             return cb({ code: 500, ok: false, message: 'error_accesing_data' });
         }
 
-        if (!UpdatedUser) {
+        if (!updatedUser) {
             return cb({ code: 404, ok: false, message: 'user_not_exist' });
         }
         else {
-            UpdatedUser.email = req.body.email;
-            UpdatedUser.firstName = req.body.firstName;
-            UpdatedUser.lastName = req.body.lastName;
+            updatedUser.email = req.body.email;
+            updatedUser.firstName = req.body.firstName;
+            updatedUser.lastName = req.body.lastName;
 
             // Calculate hash of paswword to save in database
             if (req.body.password) {
                 let hashedPassword = hash.sha256().update(req.body.password).digest('hex');
-                UpdatedUser.password = hashedPassword;
+                updatedUser.password = hashedPassword;
             }
 
             //update user
-            UpdatedUser.save(cb);
+            updatedUser.save();
+            return cb(null, updatedUser);
         }
     });
 };
