@@ -1,0 +1,24 @@
+{
+    "jwt": {
+        "PrivateKey": "unsecureKey",
+        "Options": {
+            "expiresIn": "2 days"
+        }
+    },
+    "db": {
+        "address": "mongodb://localhost/forEvents",
+        "port": "27017",
+        "user": "",
+        "pass": ""
+    },
+    "mail": {
+        "host": "smtp.gmail.com",
+        "port": "465",
+        "secure": "true",
+        "user": "",
+        "pass": ""
+    },
+    "www": {
+        "port": "3000"
+    }
+}

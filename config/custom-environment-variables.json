@@ -1,0 +1,13 @@
+{
+    "jwt": {
+        "PrivateKey": "ForEvents_jwtPrivateKey"
+    },
+    "mail": {
+        "user": "ForEvents_smtpUser",
+        "pass": "ForEvents_smtpPass"
+    },
+    "db": {
+        "user": "ForEvents_dbUser",
+        "pass": "ForEvents_dbPass"
+    }
+}

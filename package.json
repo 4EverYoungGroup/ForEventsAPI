@@ -2,6 +2,10 @@
   "name": "forevents",
   "version": "1.0.0",
   "description": "API REST Node ForEvents Project",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/4EverYoungGroup/ForEventsAPI.git"
+  },
   "scripts": {
     "start": "node ./bin/www",
     "hints": "jshint . && ./node_modules/.bin/jscs . || true"
@@ -10,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "config": "^2.0.1",
     "cookie-parser": "^1.4.3",
     "debug": "^4.1.0",
     "ejs": "^2.6.1",

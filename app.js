@@ -1,4 +1,3 @@
-
 'use strict';
 
 const express = require('express');
@@ -6,6 +5,8 @@ const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const config = require("config");
+
 //const i18n = require('i18n');
 
 /* jshint ignore:start */
@@ -17,9 +18,12 @@ require('./models/User');
 
 const app = express();
 
+require("./startup/config")();
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
 
 app.use(logger('dev'));
 app.use(bodyParser.json());

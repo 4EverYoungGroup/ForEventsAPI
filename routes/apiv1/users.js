@@ -10,14 +10,16 @@ const User = mongoose.model('User');
 //security
 const jwt = require('jsonwebtoken');
 const jwtAuth = require('../../lib/jwtAuth');
-const config = require('../../local_config');
+//const config = require('../../local_config');
 const hash = require('hash.js');
+
+const config = require('config')
 
 //mailer
 const nodemailer = require('nodemailer')
 
 // commons
-const constants = require('../../commons/constants')
+//const constants = require('../../commons/constants')
 
 /**
  *
@@ -84,7 +86,7 @@ router.post('/login', function (req, res, next) {
             } else {
                 // user found and hash is equal
                 // generate token
-                const token = jwt.sign({ user: user }, config.jwt.secret, config.jwt.options);
+                const token = jwt.sign({ user: user }, config.get('jwt.PrivateKey'), config.get('jwt.Options'));
 
                 // return the information including token as JSON
                 return res.json({ ok: true, token: token });
@@ -223,12 +225,12 @@ router.post('/recover', function (req, res, next) {
         }
         else {
             const transporter = nodemailer.createTransport({
-                host: constants.SMTP_HOST,
-                port: constants.SMTP_PORT,
-                secure: constants.SMTP_SECURE,
+                host: config.get('mail.host'),
+                port: config.get('mail.port'),
+                secure: config.get('mail.secure'),
                 auth: {
-                    user: constants.SMTP_USER,
-                    pass: constants.SMTP_PASS
+                    user: config.get('mail.user'),
+                    pass: config.get('mail.pass')
                 }
             })
 
