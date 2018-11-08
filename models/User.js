@@ -14,8 +14,8 @@ passwordSchema
     .has().digits();
 
 const userSchema = mongoose.Schema({
-    firstName: { type: String, index: true },
-    lastName: { type: String, index: true },
+    first_name: { type: String, index: true },
+    last_name: { type: String, index: true },
     email: { type: String, index: true },
     password: String,
     latitude: { type: Number },
@@ -33,8 +33,8 @@ userSchema.statics.createRecord = function (newUser, cb) {
 
     // Validations
     const valErrors = [];
-    if (newUser.firstName && !(v.isAlpha(newUser.firstName) && v.isLength(newUser.firstName, 2))) {
-        valErrors.push({ field: 'firstName', message: 'validation_invalid_firstName' });
+    if (newUser.first_name && !(v.isAlpha(newUser.first_name) && v.isLength(newUser.first_name, 2))) {
+        valErrors.push({ field: 'first_name', message: 'validation_invalid_first_name' });
     }
 
     //format email is valid
@@ -109,8 +109,8 @@ userSchema.statics.updateRecord = function (req, cb) {
 
     // Validations
     const valErrors = [];
-    if (req.body.firstName && !(v.isAlpha(req.body.firstName) && v.isLength(req.body.firstName, 2))) {
-        valErrors.push({ field: 'firstName', message: 'validation_invalid_firstName' });
+    if (req.body.first_name && !(v.isAlpha(req.body.first_name) && v.isLength(req.body.first_name, 2))) {
+        valErrors.push({ field: 'first_name', message: 'validation_invalid_first_name' });
     }
 
     //format email is valid
@@ -140,8 +140,8 @@ userSchema.statics.updateRecord = function (req, cb) {
         }
         else {
             updatedUser.email = req.body.email;
-            updatedUser.firstName = req.body.firstName;
-            updatedUser.lastName = req.body.lastName;
+            updatedUser.first_name = req.body.first_name;
+            updatedUser.last_name = req.body.last_name;
 
             // Calculate hash of paswword to save in database
             if (req.body.password) {

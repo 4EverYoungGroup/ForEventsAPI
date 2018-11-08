@@ -111,8 +111,8 @@ router.post('/login', function (req, res, next) {
  * @apiPermission none
  *
  * 
- * @apiParam {String} firstName First name of the user
- * @apiParam {String} lastName Last name of the user 
+ * @apiParam {String} first_name First name of the user
+ * @apiParam {String} last_name Last name of the user 
  * @apiParam {String} email Email of the user (unique ID)
  * @apiParam {String} password Password of the user
  *
@@ -128,14 +128,14 @@ router.post('/login', function (req, res, next) {
  *        "user": {
  *           "email": "test@gmail.com",
  *           "password": "b17e1e0450dac425ea318253f6f852972d69731d6c7499c001468b695b6da219",
- *           "firstName": "Pepe",
- *           "lastName": "García"
+ *           "first_name": "Pepe",
+ *           "last_name": "García"
  *     }
  *
  *
  * @apiError user_email_duplicated The email of the user is duplicated in database
  * @apiError user_wrong_password The password is incorrect for user provided
- * @apiError validation_invalid_firstName The lenght of firstName must be min 2 character
+ * @apiError validation_invalid_first_name The lenght of first_name must be min 2 character
  * @apiError validation_invalid_email The format of the email provided must be correct
  * @apiError password_not_valid_must_include_uppercase_lowercase_digits The password must follow the rules of complexity established
  *
@@ -151,8 +151,8 @@ router.post('/login', function (req, res, next) {
  *       "ok": false,
  *       "errors": [
  *       {
- *           "field": "firstName",
- *           "message": "validation_invalid_firstName"
+ *           "field": "first_name",
+ *           "message": "validation_invalid_first_name"
  *       },
  *       {
  *           "field": "email",
@@ -334,8 +334,8 @@ router.delete('/:user_id', function (req, res, next) {
  * @apiPermission authenticated_token_required: You must provide 'token' authorized in the querystring, body or header 'x-access-token'
  *
  * 
- * @apiParam {String} firstName First name of the user
- * @apiParam {String} lastName Last name of the user 
+ * @apiParam {String} first_name First name of the user
+ * @apiParam {String} last_name Last name of the user 
  * @apiParam {String} email Email of the user (unique ID)
  * @apiParam {String} password Password of the user
  *
@@ -351,14 +351,14 @@ router.delete('/:user_id', function (req, res, next) {
  *        "user": {
  *           "email": "test@gmail.com",
  *           "password": "",
- *           "firstName": "Pepe",
- *           "lastName": "García"
+ *           "first_name": "Pepe",
+ *           "last_name": "García"
  *        }
  *      }
  *
  * @apiError user_email_duplicated The email of the user is duplicated in database
  * @apiError user_wrong_password The password is incorrect for user provided
- * @apiError validation_invalid_firstName The lenght of firstName must be min 2 character
+ * @apiError validation_invalid_first_name The lenght of first_name must be min 2 character
  * @apiError validation_invalid_email The format of the email provided must be correct
  * @apiError password_not_valid_must_include_uppercase_lowercase_digits The password must follow the rules of complexity established
  *
@@ -381,8 +381,8 @@ router.delete('/:user_id', function (req, res, next) {
  *       "ok": false,
  *       "errors": [
  *       {
- *           "field": "firstName",
- *           "message": "validation_invalid_firstName"
+ *           "field": "first_name",
+ *           "message": "validation_invalid_first_name"
  *       },
  *       {
  *           "field": "email",
@@ -433,14 +433,14 @@ router.put('/:user_id', function (req, res, next) {
  *        "user": {
  *           "email": "test@gmail.com",
  *           "password": "b17e1e0450dac425ea318253f6f852972d69731d6c7499c001468b695b6da219",
- *           "firstName": "Pepe",
- *           "lastName": "García"
+ *           "first_name": "Pepe",
+ *           "last_name": "García"
  *        }
  *     }
  *
  * @apiError user_email_duplicated The email of the user is duplicated in database
  * @apiError user_wrong_password The password is incorrect for user provided
- * @apiError validation_invalid_firstName The lenght of firstName must be min 2 character
+ * @apiError validation_invalid_first_name The lenght of first_name must be min 2 character
  * @apiError validation_invalid_email The format of the email provided must be correct
  * @apiError password_not_valid_must_include_uppercase_lowercase_digits The password must follow the rules of complexity established
  *
