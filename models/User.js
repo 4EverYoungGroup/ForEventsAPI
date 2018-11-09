@@ -5,6 +5,13 @@ const hash = require('hash.js');  //import to calculate hash of password
 const v = require('validator'); //import to validate data 
 const pv = require('password-validator'); //control password restrictions
 
+const Favorite_search = require('./Favorite_search');
+const City = require('./City');
+const Transaction = require('./Transaction');
+const Event = require('./Event')
+
+var Schema = mongoose.Schema;
+
 const passwordSchema = new pv();
 passwordSchema
     .is().min(6)
@@ -18,9 +25,33 @@ const userSchema = mongoose.Schema({
     last_name: { type: String, index: true },
     email: { type: String, index: true },
     password: String,
-    latitude: { type: Number },
-    longitude: { type: Number }
+    address: String,
+    city: String,
+    zip_code: String,
+    province: String,
+    country: String,
+    password: String,
+    birthday: Date,
+    gender: String,
+    create_date: Date,
+    delete_date: Date,
+    alias: String,
+    idn: String,
+    company_name: String,
+    mobile_number: String,
+    phone_number: String,
+    profile: String,
+    favorite_searches: [{ type: Schema.Types.ObjectId, ref: 'Favorite_search' }],
+    city: { type: Schema.Types.ObjectId, ref: 'City' },
+    transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
+    events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
+    location: {
+        type: { type: String },
+        coordinates: [Number]
+    }
 });
+
+userSchema.index({ "location": "2dsphere" });
 
 userSchema.statics.exists = function (idUser, cb) {
     User.findById(idUser, function (err, user) {

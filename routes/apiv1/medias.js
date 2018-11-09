@@ -10,7 +10,7 @@ const Media = mongoose.model('Media');
 //security
 const jwt = require('jsonwebtoken');
 const jwtAuth = require('../../lib/jwtAuth');
-const config = require('../../local_config');
+
 
 //Auth with JWT
 
@@ -83,16 +83,16 @@ router.post('/', function (req, res, next) {
 
         if (err) return res.status(400).json(err);
 
-        
+
         // user created
         return res.status(200).json({ ok: true, message: 'media_registered', data: result });
-    }); 
+    });
 });
 
 // Return the list of available media types
 router.get('/mediatypes', function (req, res) {
     res.json({ ok: true, allowedTypes: Media.allowedTypes() });
-  });
+});
 
 
 module.exports = router;

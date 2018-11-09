@@ -1,6 +1,8 @@
 const config = require('config');
 
 module.exports = function () {
+
+    //control environment variables, if not exist app not run
     if (!config.get('jwt.PrivateKey')) {
         throw new Error('FATAL ERROR: jwt.PrivateKey is not defined.');
     }
