@@ -10,16 +10,14 @@ const User = mongoose.model('User');
 //security
 const jwt = require('jsonwebtoken');
 const jwtAuth = require('../../lib/jwtAuth');
-//const config = require('../../local_config');
 const hash = require('hash.js');
 
+//config
 const config = require('config')
 
 //mailer
 const nodemailer = require('nodemailer')
 
-// commons
-//const constants = require('../../commons/constants')
 
 /**
  *
@@ -60,12 +58,12 @@ const nodemailer = require('nodemailer')
  *     }
  */
 
-router.post('/login', function (req, res, next) {
+router.post('/login', async function (req, res, next) {
     const email = req.body.email;
     const password = req.body.password;
 
     // Find user in db
-    User.findOne({ email: email }, function (err, user) {
+    await User.findOne({ email: email }, function (err, user) {
         if (err) return next(err);
 
         if (!user) {
@@ -89,7 +87,8 @@ router.post('/login', function (req, res, next) {
                 const token = jwt.sign({ user: user }, config.get('jwt.PrivateKey'), config.get('jwt.Options'));
 
                 // return the information including token as JSON
-                return res.json({ ok: true, token: token });
+                //user.password = '**ENCRYPTED**'
+                return res.json({ ok: true, token: token, user: user });
             }
         }
     });
@@ -165,8 +164,10 @@ router.post('/login', function (req, res, next) {
  *     }
  */
 
-router.post('/register', function (req, res, next) {
-    User.createRecord(req.body, function (err, result) {
+router.post('/register', async function (req, res, next) {
+
+
+    await User.createRecord(req.body, function (err, result) {
 
         if (err) return res.status(400).json(err);
 
@@ -214,9 +215,9 @@ router.post('/register', function (req, res, next) {
  *     }
  */
 
-router.post('/recover', function (req, res, next) {
+router.post('/recover', async function (req, res, next) {
 
-    User.findOne({ email: req.body.email }, function (err, userData) {
+    await User.findOne({ email: req.body.email }, function (err, userData) {
         if (err) {
             return res.status(400).json({ ok: false, message: 'error_accesing_data' });
         }
@@ -312,8 +313,8 @@ router.use(jwtAuth());
  */
 
 
-router.delete('/:user_id', function (req, res, next) {
-    User.deleteRecord(req, function (err) {
+router.delete('/:user_id', async function (req, res, next) {
+    await User.deleteRecord(req, function (err) {
         if (err) {
             return res.status(err.code).json({ ok: err.ok, message: err.message });
         }
@@ -395,9 +396,9 @@ router.delete('/:user_id', function (req, res, next) {
  *     }
  */
 
-router.put('/:user_id', function (req, res, next) {
+router.put('/:user_id', async function (req, res, next) {
 
-    User.updateRecord(req, function (err, result) {
+    await User.updateRecord(req, function (err, result) {
         if (err) {
             return res.json(err);
         }
@@ -461,8 +462,8 @@ router.put('/:user_id', function (req, res, next) {
 
 
 
-router.get('/:user_id', function (req, res, next) {
-    User.getRecord(req, function (err, result) {
+router.get('/:user_id', async function (req, res, next) {
+    await User.getRecord(req, function (err, result) {
         if (err) {
             return res.status(err.code).json({ ok: err.ok, message: err.message });
         }

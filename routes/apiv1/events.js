@@ -19,10 +19,10 @@ router.get('/', async (req, res, next) => {
       try {
         const queryId = req.query.queryId;
         var exists = await Event.existsId(queryId);
-        res.json({ succes: true, result: exists });
+        res.json({ ok: true, result: exists });
       } catch (error) {
         exists = 0;
-        res.json({ succes: true, result: exists });
+        res.json({ ok: true, result: exists });
       }
     } else {
       const limit = parseInt(req.query.limit);
@@ -40,11 +40,11 @@ router.get('/', async (req, res, next) => {
 
       if (req.query.includeTotal === 'true') {
 
-        res.json({ succes: true, total: rowsCount, result: list });
+        res.json({ ok: true, total: rowsCount, result: list });
 
       } else {
 
-        res.json({ succes: true, result: list });
+        res.json({ ok: true, result: list });
 
       };
     }
@@ -68,7 +68,7 @@ router.post('/', async (req, res, next) => {
       Event.insertEvent(filter[1], function (err, result) {
         if (err) return res.status(400).json(err);
         // Event created
-        return res.status(200).json({ succes: true, message: 'Event_registered', data: result });
+        return res.status(200).json({ ok: true, message: 'Event_registered', data: result });
       });
     } else {
       res.status(400).json({ succes: false, message: 'Unauthorized user to manage events' });
@@ -104,7 +104,7 @@ router.delete('/:id', async (req, res, next) => {
     if (exists === 1) {
       try {
         await Event.deleteEvent({ _id: _id });
-        return res.status(200).json({ succes: true, message: 'Event_deleted' });
+        return res.status(200).json({ ok: true, message: 'Event_deleted' });
       } catch (err) {
         next(err);
       }

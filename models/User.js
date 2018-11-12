@@ -2,8 +2,9 @@
 
 const mongoose = require('mongoose');
 const hash = require('hash.js');  //import to calculate hash of password
-const v = require('validator'); //import to validate data 
+//const v = require('validator'); //import to validate data 
 const pv = require('password-validator'); //control password restrictions
+const Joi = require('joi'); //validate data provided API
 
 const Favorite_search = require('./Favorite_search');
 const City = require('./City');
@@ -20,35 +21,45 @@ passwordSchema
     .has().lowercase()
     .has().digits();
 
+const GenderTypes = Object.freeze({
+    M: 'Male',
+    F: 'Female',
+    O: 'Other'
+});
+
+const ProfileTypes = Object.freeze({
+    Admin: 'Admin',
+    User: 'User',
+    Organizer: 'Organizer'
+});
+
 const userSchema = mongoose.Schema({
-    first_name: { type: String, index: true },
+    first_name: { type: String, index: true, required: true },
     last_name: { type: String, index: true },
-    email: { type: String, index: true },
-    password: String,
+    email: { type: String, index: true, required: true },
+    password: { type: String, required: true },
+    profile: { type: String, enum: Object.values(ProfileTypes), default: 'User' },
+    alias: String,
+    birthday_date: Date,
+    gender: { type: String, enum: Object.keys(GenderTypes) },
     address: String,
-    city: String,
-    zip_code: String,
+    zip_code: Number,
     province: String,
     country: String,
-    password: String,
-    birthday: Date,
-    gender: String,
-    create_date: Date,
-    delete_date: Date,
-    alias: String,
     idn: String,
     company_name: String,
     mobile_number: String,
     phone_number: String,
-    profile: String,
+    create_date: { type: Date },
+    delete_date: Date,
     favorite_searches: [{ type: Schema.Types.ObjectId, ref: 'Favorite_search' }],
     city: { type: Schema.Types.ObjectId, ref: 'City' },
     transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
     events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
-    location: {
-        type: { type: String },
-        coordinates: [Number]
-    }
+    // location: {
+    //     type: { type: String },
+    //     coordinates: [Number]
+    // }
 });
 
 userSchema.index({ "location": "2dsphere" });
@@ -62,18 +73,17 @@ userSchema.statics.exists = function (idUser, cb) {
 
 userSchema.statics.createRecord = function (newUser, cb) {
 
-    // Validations
+    //Validation with joi
     const valErrors = [];
-    if (newUser.first_name && !(v.isAlpha(newUser.first_name) && v.isLength(newUser.first_name, 2))) {
-        valErrors.push({ field: 'first_name', message: 'validation_invalid_first_name' });
-    }
 
-    //format email is valid
-    if (!v.isEmail(newUser.email)) {
-        valErrors.push({ field: 'email', message: 'validation_invalid_email' });
+    const { error } = validateUser(newUser);
+    if (error) {
+        error.details.map(function (err) {
+            valErrors.push({ field: err.context.key, message: err.message });
+        });
+        //return cb({ ok: false, errors: valErrors });
     }
-
-    //control restrictions passwor, must include 1 letter uppercase, 1 letter lowercase and 1 digit 
+    //control restrictions password, must include 1 letter uppercase, 1 letter lowercase and 1 digit 
     if (!passwordSchema.validate(newUser.password)) {
         valErrors.push({ field: 'password', message: 'password_not_valid_must_include_uppercase_lowercase_digits' });
     }
@@ -81,7 +91,6 @@ userSchema.statics.createRecord = function (newUser, cb) {
     if (valErrors.length > 0) {
         return cb({ ok: false, errors: valErrors });
     }
-
 
     // Verify duplicates
     // Find user
@@ -99,7 +108,9 @@ userSchema.statics.createRecord = function (newUser, cb) {
             // Calculate hash of paswword to save in database
             let hashedPassword = hash.sha256().update(newUser.password).digest('hex');
             newUser.password = hashedPassword;
-
+            //Initilize creation date
+            newUser.create_date = Date.now();
+            newUser.delete_date = null;
             // Create user
             new User(newUser).save();
             return cb(null, newUser);
@@ -145,7 +156,7 @@ userSchema.statics.updateRecord = function (req, cb) {
     }
 
     //format email is valid
-    if (!v.isEmail(req.body.email)) {
+    if (req.body.email && !v.isEmail(req.body.email)) {
         valErrors.push({ field: 'email', message: 'validation_invalid_email' });
     }
 
@@ -216,4 +227,73 @@ userSchema.statics.getRecord = function (req, cb) {
     })
 
 }
+
+function validateUser(user) {
+    const schema = {
+        first_name: Joi
+            .string()
+            .min(2)
+            .max(50)
+            .required(),
+        last_name: Joi
+            .string()
+            .min(2)
+            .max(255),
+        email: Joi
+            .string()
+            .min(6)
+            .max(255)
+            .required()
+            .email({ minDomainAtoms: 2 }),
+        password: Joi
+            .string()
+            .regex(/^[a-zA-Z0-9]{6,50}$/)
+            .required(),
+        profile: Joi
+            .string()
+            .valid(Object.keys(ProfileTypes)),
+        address: Joi
+            .string()
+            .max(255),
+        city: Joi
+            .objectId(),
+        zip_code: Joi
+            .string()
+            .regex(/^[0-9]{5}$/),
+        province: Joi
+            .string()
+            .alphanum()
+            .max(255),
+        country: Joi
+            .string()
+            .alphanum()
+            .max(255),
+        birthday_date: Joi
+            .date(),
+        gender: Joi
+            .string()
+            .valid(Object.keys(GenderTypes)),
+        alias: Joi
+            .string()
+            .alphanum()
+            .max(255),
+        idn: Joi
+            .string()
+            .alphanum()
+            .max(50),
+        company_name: Joi
+            .string()
+            .max(255),
+        mobile_number: Joi
+            .string()
+            .regex(/^[0-9]{9}$/),
+        phone_number: Joi
+            .string()
+            .regex(/^[0-9]{9}$/)
+    };
+    return Joi.validate(user, schema, { abortEarly: false });
+}
 var User = mongoose.model('User', userSchema);
+
+
+
