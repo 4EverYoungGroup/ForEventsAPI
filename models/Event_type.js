@@ -71,12 +71,20 @@ event_typeSchema.statics.insertFavorite_Search = function(event_typeId,favorite_
 }
 
 //List of Event_type all or filter to _id
-event_typeSchema.statics.list = function(req){
+event_typeSchema.statics.list = function(req, event_typeName){
+    
+    if (event_typeName){
+        const query = Event_type.findOne({'name': event_typeName});
+        return query.exec();
+        };
+
+    
     const name = req.query.name;
     const id = req.query.id;
     const events = req.query.events;
     const favorite_searches= req.query.favorite_searches;
-    
+    console.log("El nombre es:" + name)
+
     if(name){
         const query = Event_type.findOne({'name': name});
         if(events){
