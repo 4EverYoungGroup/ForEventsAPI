@@ -13,33 +13,41 @@ var Schema = mongoose.Schema;
 
 
 // Insert New event_type
-router.post('/', (req, res, next) => {
+router.post('/', (req,res,next) => {
     const name = req.query.name;
-    if (name === "yes") {
+    if (name){
         var event_type = new Event_type({
-            name: 'Campeonato de atletismo pista cubierta',
+            name: name
         });
-        var insert = Event_type.insertEvent_type(event_type)
-        var insert2 = Event_type.insertEvent('5bdf32c52550bf4c98761693', '5bdb5978e3acf52d7941259c')
-        console.log(insert._id, insert2)
-        return res.json({ ok: true, result: insert });
+        
+        Event_type.insertEvent_type(event_type, function(err, result){
+            if (err) return result.status(400).json({ok: false, message: 'Error Event_type_NOT_registered', err});
+            // Event created
+            return res.status(200).json({ ok: true, message: 'Event_type_registered', data: result });
+        });   
     };
 });
 
 router.get('/', async (req, res, next) => {
-    try {
-        const nombre = req.query.inserta;
-        if (nombre === "total") {
-            const list = await Event_type.list();
-            res.json({ ok: true, result: list });
-        } else if (nombre === "id") {
-            const list = await Event_type.list('5bdf2183792a22438c9abc77');
-            res.json({ ok: true, result: list });
+    try{
+    // const name = req.query.name;
+    // const id = req.query.id;
+    const list = await Event_type.list(req);
+    res.status(200).json({ok: true, result: list});
 
-        } else {
-            res.send('Hello World 4events');
-        }
-    } catch (err) {
+    //     res.json({ok: true, result: list});
+    // if (!name && !id){  
+    //     const list = await Event_type.list();
+    //     res.json({ok: true, result: list});
+    // } else if(name){
+    //     const list = await Event_type.list('',name);
+    //     res.status(200).json({ok: true, result: list});
+   
+    // } else {
+    //     const list = await Event_type.list(id);
+    //     res.status(200).json({ok: true, result: list});
+    // }
+    } catch (err){
         next(err);
     }
 });
