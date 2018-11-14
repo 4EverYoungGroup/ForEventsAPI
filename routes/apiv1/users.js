@@ -68,7 +68,7 @@ router.post('/login', async function (req, res, next) {
 
         if (!user) {
             return res.status(400).json({
-                ok: false, message: 'user_not_found'
+                ok: false, message: 'user_or_pass_wrong'
             });
         } else if (user) {
 
@@ -79,7 +79,7 @@ router.post('/login', async function (req, res, next) {
             if (user.password != passHash) {
                 //hashes not equal
                 return res.status(400).json({
-                    ok: false, message: 'user_wrong_password'
+                    ok: false, message: 'user_or_password_wrong'
                 });
             } else {
                 // user found and hash is equal
