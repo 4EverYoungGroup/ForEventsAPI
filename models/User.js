@@ -200,9 +200,10 @@ userSchema.statics.updateRecord = function (req, cb) {
 
 userSchema.statics.getRecord = function (req, cb) {
 
-    //if (req.params.user_id != req.decoded.user._id){
-    //    return cb({ code: 403 , message: 'action_not_allowed_credentials_error'})      
-    //}
+    if (req.params.user_id != req.decoded.user._id) {
+        return cb({ code: 403, message: 'action_not_allowed_credentials_error' })
+    }
+
 
     User.findOne({ _id: req.params.user_id }, function (err, userDB) {
         if (err) {
@@ -227,6 +228,60 @@ userSchema.statics.getRecord = function (req, cb) {
     })
 
 }
+
+// We create a static method to search for users
+// The search can be paged and ordered
+userSchema.statics.getList = function (filters, limit, skip, sort, fields, transaction, favorite_searches, city, events, includeTotal, cb) {
+    const query = User.find(filters);
+    query.limit(limit);
+    query.skip(skip);
+    query.sort(sort);
+    query.select(fields);
+
+
+    if (favorite_searches) {
+        query.populate('favorite_searches', favorite_searches);
+    };
+    if (transaction) {
+        query.populate('transactions', transaction);
+    };
+    if (events) {
+        query.populate('events', events);
+    };
+    if (city) {
+        query.populate('city', city);
+    }
+
+    return query.exec(function (err, rows) {
+        if (err) return cb(err);
+
+        const result = { rows: rows };
+
+        if (!includeTotal) return cb(null, result);
+
+        // incluir propiedad total
+        User.countDocuments({}, (err, total) => {
+            if (err) return cb(err);
+            result.total = total;
+            return cb(null, result);
+        });
+    });
+
+
+    //return query.exec();
+}
+
+
+//User profile
+
+userSchema.statics.userProfileS = function (userId, profile) {
+    if (userId.length === 24) {
+        var exists = User.count({ _id: userId, profile: profile });
+        return exists.exec()
+    } else {
+        throw new Error('The id must contain 24 characters or not exists!');
+    }
+};
 
 function validateUser(user) {
     const schema = {

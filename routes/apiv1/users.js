@@ -18,6 +18,7 @@ const config = require('config')
 //mailer
 const nodemailer = require('nodemailer')
 
+const constructSearchFilter = require('../../lib/utilitiesUsers');
 
 /**
  *
@@ -58,12 +59,12 @@ const nodemailer = require('nodemailer')
  *     }
  */
 
-router.post('/login', async function (req, res, next) {
+router.post('/login', function (req, res, next) {
     const email = req.body.email;
     const password = req.body.password;
 
     // Find user in db
-    await User.findOne({ email: email }, function (err, user) {
+    User.findOne({ email: email }, function (err, user) {
         if (err) return next(err);
 
         if (!user) {
@@ -164,10 +165,10 @@ router.post('/login', async function (req, res, next) {
  *     }
  */
 
-router.post('/register', async function (req, res, next) {
+router.post('/register', function (req, res, next) {
 
 
-    await User.createRecord(req.body, function (err, result) {
+    User.createRecord(req.body, function (err, result) {
 
         if (err) return res.status(400).json(err);
 
@@ -215,9 +216,9 @@ router.post('/register', async function (req, res, next) {
  *     }
  */
 
-router.post('/recover', async function (req, res, next) {
+router.post('/recover', function (req, res, next) {
 
-    await User.findOne({ email: req.body.email }, function (err, userData) {
+    User.findOne({ email: req.body.email }, function (err, userData) {
         if (err) {
             return res.status(400).json({ ok: false, message: 'error_accesing_data' });
         }
@@ -256,7 +257,7 @@ router.post('/recover', async function (req, res, next) {
     })
 });
 
-//Auth with JWT
+//Auth with JWT - ***************
 
 router.use(jwtAuth());
 
@@ -313,8 +314,8 @@ router.use(jwtAuth());
  */
 
 
-router.delete('/:user_id', async function (req, res, next) {
-    await User.deleteRecord(req, function (err) {
+router.delete('/:user_id', function (req, res, next) {
+    User.deleteRecord(req, function (err) {
         if (err) {
             return res.status(err.code).json({ ok: err.ok, message: err.message });
         }
@@ -396,15 +397,38 @@ router.delete('/:user_id', async function (req, res, next) {
  *     }
  */
 
-router.put('/:user_id', async function (req, res, next) {
+router.put('/:user_id', function (req, res, next) {
 
-    await User.updateRecord(req, function (err, result) {
+    User.updateRecord(req, function (err, result) {
         if (err) {
             return res.json(err);
         }
         //user deleted
         return res.status(200).json({ ok: true, message: 'user_updated', user: result });
     });
+});
+
+router.get('/list', function (req, res, next) {
+
+
+    const skip = parseInt(req.query.skip) || 0;
+    const limit = parseInt(req.query.limit) || 100; // our api retunn  max 1000 registers
+    const sort = req.query.sort || '_id';
+    const includeTotal = req.query.includeTotal === 'true';
+    const fields = req.query.fields || 'first_name last_name profile email';
+    const transaction = req.query.transaction;
+    const favorite_searches = req.query.favorite_searches;
+    const city = req.query.city;
+    const events = req.query.events;
+    const filters = constructSearchFilter(req);
+
+    console.log(filters);
+
+    User.getList(filters, limit, skip, sort, fields, transaction, favorite_searches, city, events, includeTotal, function (err, result) {
+        if (err) return res.json(err);
+        return res.json({ ok: true, result: result });
+    });
+
 });
 
 /**
@@ -462,8 +486,9 @@ router.put('/:user_id', async function (req, res, next) {
 
 
 
-router.get('/:user_id', async function (req, res, next) {
-    await User.getRecord(req, function (err, result) {
+router.get('/:user_id', function (req, res, next) {
+    console.log('POR AQUIIIII get userid')
+    User.getRecord(req, function (err, result) {
         if (err) {
             return res.status(err.code).json({ ok: err.ok, message: err.message });
         }
@@ -471,6 +496,8 @@ router.get('/:user_id', async function (req, res, next) {
         return res.status(200).json({ ok: true, message: 'user_info', user: result });
     });
 });
+
+
 
 
 module.exports = router;
