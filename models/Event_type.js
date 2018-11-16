@@ -117,6 +117,8 @@ event_typeSchema.statics.list = function(req, event_typeName){
 }
 
 
+
+
 //Create model
 const Event_type = mongoose.model('Event_type', event_typeSchema);
 
