@@ -131,17 +131,21 @@ router.delete('/:id', async (req,res, next) =>{
     const profile = req.query.profile;
     const organizer = req.query.organizer;
     if (_id && profile && organizer){
-        const exists = await User.userProfileS(organizer, profile);
-        if (exists === 1){
-            try{
-                await Event.deleteEvent({_id: _id });
-                return res.status(200).json({ ok: true, message: 'Event_deleted' });
-            }catch (err){
-                next(err);
-            }
-        }else {
-            res.status(400).json({ok: false, message: 'Unauthorized user to manage events'});
-        };
+        try{
+            const exists = await User.userProfileS(organizer, profile);
+            if (exists === 1){
+                try{
+                    await Event.deleteEvent({_id: _id });
+                    return res.status(200).json({ ok: true, message: 'Event_deleted' });
+                }catch (err){
+                    res.status(400).json({ok: false, message: err});
+                }
+            }else {
+                res.status(400).json({ok: false, message: 'Unauthorized user to manage events'});
+            };
+        }catch{
+            res.status(400).json({ok: false, message: 'Unauthorized user or profile'});
+        }
     }else{
     res.status(400).json({ok: false, message: 'Incomplete data'});
 };
