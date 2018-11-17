@@ -118,7 +118,7 @@ userSchema.statics.createRecord = function (newUser, cb) {
 userSchema.statics.deleteRecord = function (req, cb) {
     //console.log('req.params._id: ' + req.params.user_id + ' req.decoded._id: ' + req.decoded.user._id);
     //console.log(req.decoded.user.email);
-    if (req.params.user_id != req.decoded.user._id || req.decoded.user.profile != 'Admin') {
+    if (req.params.user_id != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
         return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
 
     }
@@ -143,27 +143,37 @@ userSchema.statics.deleteRecord = function (req, cb) {
 }
 
 userSchema.statics.updateRecord = function (req, cb) {
+    console.log('req.params._id: ' + req.params.user_id + ' req.decoded._id: ' + req.decoded.user._id);
 
-    // Validations
+    if (req.params.user_id != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
+        return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
+
+    }
+
+    //Validation with joi
     const valErrors = [];
-    if (req.body.first_name && !(v.isAlpha(req.body.first_name) && v.isLength(req.body.first_name, 2))) {
-        valErrors.push({ field: 'first_name', message: 'validation_invalid_first_name' });
+
+    //console.log(Object.keys(req.body).length)
+    if (Object.keys(req.body).length <= 1) {
+        valErrors.push({ field: 'none', message: 'nothing_to_update' });
     }
 
-    //format email is valid
-    if (req.body.email && !v.isEmail(req.body.email)) {
-        valErrors.push({ field: 'email', message: 'validation_invalid_email' });
+    const { error } = validateUpdatedUser(req.body);
+    if (error) {
+        error.details.map(function (err) {
+            valErrors.push({ field: err.context.key, message: err.message });
+        });
     }
 
-
-    //control restrictions passwor, must include 1 letter uppercase, 1 letter lowercase and 1 digit 
-    if (req.body.password && !passwordSchema.validate(req.body.password)) {
+    //control restrictions password, must include 1 letter uppercase, 1 letter lowercase and 1 digit 
+    if ((typeof req.body.password != 'undefined') && !passwordSchema.validate(req.body.password)) {
         valErrors.push({ field: 'password', message: 'password_not_valid_must_include_uppercase_lowercase_digits' });
     }
 
     if (valErrors.length > 0) {
-        return cb({ code: 400, ok: false, errors: valErrors });
+        return cb({ ok: false, errors: valErrors });
     }
+
 
     // Find user
     User.findOne({ email: req.decoded.user.email }, function (err, updatedUser) {
@@ -179,12 +189,22 @@ userSchema.statics.updateRecord = function (req, cb) {
             updatedUser.email = req.body.email;
             updatedUser.first_name = req.body.first_name;
             updatedUser.last_name = req.body.last_name;
-
             // Calculate hash of paswword to save in database
             if (req.body.password) {
                 let hashedPassword = hash.sha256().update(req.body.password).digest('hex');
                 updatedUser.password = hashedPassword;
             }
+            updatedUser.alias = req.body.alias;
+            updatedUser.birthday_date = req.body.birthday_date;
+            updatedUser.gender = req.body.gender;
+            updatedUser.address = req.body.address;
+            updatedUser.zip_code = req.body.zip_code;
+            updatedUser.province = req.body.province;
+            updatedUser.country = req.body.country;
+            updatedUser.idn = req.body.idn;
+            updatedUser.company_name = req.body.company_name;
+            updatedUser.mobile_number = req.body.mobile_number;
+            updatedUser.phone_number = req.body.phone_number;
 
             //update user
             updatedUser.save();
@@ -331,6 +351,72 @@ function validateUser(user) {
     };
     return Joi.validate(user, schema, { abortEarly: false });
 }
+
+
+function validateUpdatedUser(user) {
+    const schema = {
+        first_name: Joi
+            .string()
+            .min(2)
+            .max(50),
+        last_name: Joi
+            .string()
+            .min(2)
+            .max(255),
+        email: Joi
+            .string()
+            .min(6)
+            .max(255)
+            .email({ minDomainAtoms: 2 }),
+        password: Joi
+            .string()
+            .regex(/^[a-zA-Z0-9]{6,50}$/),
+        profile: Joi
+            .string()
+            .valid(Object.keys(ProfileTypes)),
+        address: Joi
+            .string()
+            .max(255),
+        city: Joi
+            .objectId(),
+        zip_code: Joi
+            .string()
+            .max(20),
+        province: Joi
+            .string()
+            .alphanum()
+            .max(255),
+        country: Joi
+            .string()
+            .max(255),
+        birthday_date: Joi
+            .date(),
+        gender: Joi
+            .string()
+            .valid(Object.keys(GenderTypes)),
+        alias: Joi
+            .string()
+            .alphanum()
+            .max(255),
+        idn: Joi
+            .string()
+            .alphanum()
+            .max(50),
+        company_name: Joi
+            .string()
+            .max(255),
+        mobile_number: Joi
+            .string()
+            .regex(/^[0-9]{9}$/),
+        phone_number: Joi
+            .string()
+            .regex(/^[0-9]{9}$/),
+        token: Joi
+            .string()
+    };
+    return Joi.validate(user, schema, { abortEarly: false });
+}
+
 var User = mongoose.model('User', userSchema);
 
 

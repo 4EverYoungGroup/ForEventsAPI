@@ -403,14 +403,13 @@ router.put('/:user_id', function (req, res, next) {
         if (err) {
             return res.json(err);
         }
-        //user deleted
+        //user updated
         return res.status(200).json({ ok: true, message: 'user_updated', user: result });
     });
 });
 
 router.get('/list', function (req, res, next) {
 
-    console.log(req.decoded.user.profile);
     if (req.decoded.user.profile != 'Admin') {
         return res.status(403).json({ ok: false, message: 'action_only_allowed_to_admin_users' })
     }
