@@ -107,8 +107,9 @@ userSchema.statics.createRecord = function (newUser, cb) {
             newUser.create_date = Date.now();
             newUser.delete_date = null;
             // Create user
-            new User(newUser).save();
-            return cb(null, newUser);
+            new User(newUser).save(cb);
+
+            //return cb(null, newUser);
         }
     });
 
@@ -117,11 +118,10 @@ userSchema.statics.createRecord = function (newUser, cb) {
 userSchema.statics.deleteRecord = function (req, cb) {
     //console.log('req.params._id: ' + req.params.user_id + ' req.decoded._id: ' + req.decoded.user._id);
     //console.log(req.decoded.user.email);
-    if (req.params.user_id != req.decoded.user._id) {
-        return cb({ code: 403, ok: false, message: 'action_not_allowed_credentials_error' })
+    if (req.params.user_id != req.decoded.user._id || req.decoded.user.profile != 'Admin') {
+        return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
 
     }
-    //TODO: Validate admin user to allow acciont
 
 
     User.findOne({ email: req.decoded.user.email }, function (err, DeletedUser) {
