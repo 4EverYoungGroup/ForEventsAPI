@@ -410,7 +410,6 @@ router.put('/:user_id', function (req, res, next) {
 
 router.get('/list', function (req, res, next) {
 
-
     const skip = parseInt(req.query.skip) || 0;
     const limit = parseInt(req.query.limit) || 100; // our api retunn  max 1000 registers
     const sort = req.query.sort || '_id';
@@ -422,7 +421,7 @@ router.get('/list', function (req, res, next) {
     const events = req.query.events;
     const filters = constructSearchFilter(req);
 
-    console.log(filters);
+
 
     User.getList(filters, limit, skip, sort, fields, transaction, favorite_searches, city, events, includeTotal, function (err, result) {
         if (err) return res.json(err);
@@ -487,7 +486,6 @@ router.get('/list', function (req, res, next) {
 
 
 router.get('/:user_id', function (req, res, next) {
-    console.log('POR AQUIIIII get userid')
     User.getRecord(req, function (err, result) {
         if (err) {
             return res.status(err.code).json({ ok: err.ok, message: err.message });

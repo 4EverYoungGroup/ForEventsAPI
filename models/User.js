@@ -2,7 +2,6 @@
 
 const mongoose = require('mongoose');
 const hash = require('hash.js');  //import to calculate hash of password
-//const v = require('validator'); //import to validate data 
 const pv = require('password-validator'); //control password restrictions
 const Joi = require('joi'); //validate data provided API
 
@@ -56,13 +55,9 @@ const userSchema = mongoose.Schema({
     city: { type: Schema.Types.ObjectId, ref: 'City' },
     transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
     events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
-    // location: {
-    //     type: { type: String },
-    //     coordinates: [Number]
-    // }
 });
 
-userSchema.index({ "location": "2dsphere" });
+
 
 userSchema.statics.exists = function (idUser, cb) {
     User.findById(idUser, function (err, user) {
@@ -120,8 +115,8 @@ userSchema.statics.createRecord = function (newUser, cb) {
 };
 
 userSchema.statics.deleteRecord = function (req, cb) {
-    console.log('req.params._id: ' + req.params.user_id + ' req.decoded._id: ' + req.decoded.user._id);
-    console.log(req.decoded.user.email);
+    //console.log('req.params._id: ' + req.params.user_id + ' req.decoded._id: ' + req.decoded.user._id);
+    //console.log(req.decoded.user.email);
     if (req.params.user_id != req.decoded.user._id) {
         return cb({ code: 403, ok: false, message: 'action_not_allowed_credentials_error' })
 
@@ -239,19 +234,19 @@ userSchema.statics.getList = function (filters, limit, skip, sort, fields, trans
     query.select(fields);
 
 
-    if (favorite_searches) {
-        query.populate('favorite_searches', favorite_searches);
-    };
-    if (transaction) {
-        query.populate('transactions', transaction);
-    };
-    if (events) {
-        query.populate('events', events);
-    };
-    if (city) {
-        query.populate('city', city);
-    }
-
+    // if (favorite_searches) {
+    //     query.populate('favorite_searches', favorite_searches);
+    // };
+    // if (transaction) {
+    //     query.populate('transactions', transaction);
+    // };
+    // if (events) {
+    //     query.populate('events', events);
+    // };
+    query.populate('favorite_searches');
+    query.populate('transactions');
+    query.populate('events');
+    query.populate('city');
     return query.exec(function (err, rows) {
         if (err) return cb(err);
 
@@ -321,7 +316,6 @@ function validateUser(user) {
             .max(255),
         country: Joi
             .string()
-            .alphanum()
             .max(255),
         birthday_date: Joi
             .date(),
