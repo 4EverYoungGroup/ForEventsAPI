@@ -264,7 +264,6 @@ userSchema.statics.getList = function (filters, limit, skip, sort, fields, trans
 
         const result = {
             rows: rows,
-            count: rows.length
         };
         //console.log(rows.length)
 
@@ -274,7 +273,7 @@ userSchema.statics.getList = function (filters, limit, skip, sort, fields, trans
         User.countDocuments({}, (err, total) => {
             if (err) return cb(err);
 
-            result.total = total;
+            result.total = rows.length;
             return cb(null, result);
         });
     });
