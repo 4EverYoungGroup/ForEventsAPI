@@ -262,13 +262,18 @@ userSchema.statics.getList = function (filters, limit, skip, sort, fields, trans
     return query.exec(function (err, rows) {
         if (err) return cb(err);
 
-        const result = { rows: rows };
+        const result = {
+            rows: rows,
+            count: rows.length
+        };
+        //console.log(rows.length)
 
         if (!includeTotal) return cb(null, result);
 
         // incluir propiedad total
         User.countDocuments({}, (err, total) => {
             if (err) return cb(err);
+
             result.total = total;
             return cb(null, result);
         });
