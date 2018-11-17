@@ -410,6 +410,11 @@ router.put('/:user_id', function (req, res, next) {
 
 router.get('/list', function (req, res, next) {
 
+    console.log(req.decoded.user.profile);
+    if (req.decoded.user.profile != 'Admin') {
+        return res.status(403).json({ ok: false, message: 'action_only_allowed_to_admin_users' })
+    }
+
     const skip = parseInt(req.query.skip) || 0;
     const limit = parseInt(req.query.limit) || 100; // our api retunn  max 1000 registers
     const sort = req.query.sort || '_id';

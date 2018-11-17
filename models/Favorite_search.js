@@ -19,7 +19,7 @@ const favorite_searchSchema = Schema({
 
 
 //Create model
-const Favorite_Search = mongoose.model('Favorite_search', favorite_searchSchema);
+const Favorite_search = mongoose.model('Favoritesearch', favorite_searchSchema);
 
 //and export model
-module.exports = Favorite_Search;
+module.exports = Favorite_search;

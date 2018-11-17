@@ -42,7 +42,7 @@ const userSchema = mongoose.Schema({
     birthday_date: Date,
     gender: { type: String, enum: Object.keys(GenderTypes) },
     address: String,
-    zip_code: Number,
+    zip_code: String,
     province: String,
     country: String,
     idn: String,
@@ -51,7 +51,7 @@ const userSchema = mongoose.Schema({
     phone_number: String,
     create_date: { type: Date },
     delete_date: Date,
-    favorite_searches: [{ type: Schema.Types.ObjectId, ref: 'Favorite_search' }],
+    favorite_searches: [{ type: Schema.Types.ObjectId, ref: 'Favoritesearch' }],
     city: { type: Schema.Types.ObjectId, ref: 'City' },
     transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
     events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
@@ -209,7 +209,6 @@ userSchema.statics.getRecord = function (req, cb) {
             return cb({ code: 404, ok: false, message: 'user_not_exists' })
         }
         else {
-            //console.log('requ.params.user_id: ' + req.params.user_id + ' req.decoded.user._id: ' + req.decoded.user._id)
             if (req.params.user_id != req.decoded.user._id) {
                 //restricted access to data of user , password is not available
                 //TODO avoid initialization to '', delete of the propertie, delete not running well
@@ -227,22 +226,15 @@ userSchema.statics.getRecord = function (req, cb) {
 // We create a static method to search for users
 // The search can be paged and ordered
 userSchema.statics.getList = function (filters, limit, skip, sort, fields, transaction, favorite_searches, city, events, includeTotal, cb) {
+
+
+
     const query = User.find(filters);
     query.limit(limit);
     query.skip(skip);
     query.sort(sort);
     query.select(fields);
 
-
-    // if (favorite_searches) {
-    //     query.populate('favorite_searches', favorite_searches);
-    // };
-    // if (transaction) {
-    //     query.populate('transactions', transaction);
-    // };
-    // if (events) {
-    //     query.populate('events', events);
-    // };
     query.populate('favorite_searches');
     query.populate('transactions');
     query.populate('events');
@@ -261,13 +253,10 @@ userSchema.statics.getList = function (filters, limit, skip, sort, fields, trans
             return cb(null, result);
         });
     });
-
-
-    //return query.exec();
 }
 
 
-//User profile
+//User profile 
 
 userSchema.statics.userProfileS = function (userId, profile) {
     if (userId.length === 24) {
@@ -309,7 +298,7 @@ function validateUser(user) {
             .objectId(),
         zip_code: Joi
             .string()
-            .regex(/^[0-9]{5}$/),
+            .max(20),
         province: Joi
             .string()
             .alphanum()
