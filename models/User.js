@@ -124,13 +124,13 @@ userSchema.statics.deleteRecord = function (req, cb) {
     }
 
 
-    User.findOne({ email: req.decoded.user.email }, function (err, DeletedUser) {
+    User.findOne({ _id: req.params.user_id }, function (err, DeletedUser) {
         if (err) {
             return cb({ code: 500, ok: false, message: 'error_accesing_data' });
         }
 
         if (!DeletedUser) {
-            return cb({ code: 404, ok: false, message: 'email_not_exist' })
+            return cb({ code: 404, ok: false, message: 'user_not_exist' })
         }
         else {
             DeletedUser.remove(cb);
@@ -325,7 +325,6 @@ function validateUser(user) {
             .max(20),
         province: Joi
             .string()
-            .alphanum()
             .max(255),
         country: Joi
             .string()
@@ -388,7 +387,6 @@ function validateUpdatedUser(user) {
             .max(20),
         province: Joi
             .string()
-            .alphanum()
             .max(255),
         country: Joi
             .string()
