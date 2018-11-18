@@ -64,7 +64,7 @@ router.delete('/:id', async (req,res, next) =>{
     if (_id && admin){
         try{
             const exists = await User.userProfileS(admin, "Admin");
-
+            console.log('existe: '+ exists);
             if (exists === 1){
                 try{
                     await Event_type.remove({_id: _id }).exec();
@@ -77,7 +77,7 @@ router.delete('/:id', async (req,res, next) =>{
             };
         }catch(err){
 
-            res.status(400).json({ok: false, message: 'Unauthorized user or profile with error: ' + err});
+            res.status(400).json({ok: false, message: 'Unauthorized user or profile'});
         }
     }else{
     res.status(400).json({ok: false, message: 'Incomplete data'});
