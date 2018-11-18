@@ -33,10 +33,10 @@ const ProfileTypes = Object.freeze({
 });
 
 const userSchema = mongoose.Schema({
-    first_name: { type: String, index: true, required: true },
+    first_name: { type: String, index: true },
     last_name: { type: String, index: true },
-    email: { type: String, index: true, required: true },
-    password: { type: String, required: true },
+    email: { type: String, index: true },
+    password: { type: String },
     profile: { type: String, enum: Object.values(ProfileTypes), default: 'User' },
     alias: String,
     birthday_date: Date,
@@ -157,7 +157,7 @@ userSchema.statics.updateRecord = function (req, cb) {
     const valErrors = [];
 
     //console.log(Object.keys(req.body).length)
-    if (Object.keys(req.body).length <= 1) {
+    if (((typeof req.body.token != 'undefined') && Object.keys(req.body).length == 1) || Object.keys(req.body).length < 1) {
         valErrors.push({ field: 'none', message: 'nothing_to_update' });
     }
 
@@ -179,7 +179,7 @@ userSchema.statics.updateRecord = function (req, cb) {
 
 
     // Find user
-    User.findOne({ email: req.decoded.user.email }, function (err, updatedUser) {
+    User.findOne({ _id: req.params.user_id }, function (err, updatedUser) {
 
         if (err) {
             return cb({ code: 500, ok: false, message: 'error_accesing_data' });
