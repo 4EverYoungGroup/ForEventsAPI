@@ -77,7 +77,7 @@ router.delete('/:id', async (req,res, next) =>{
             };
         }catch(err){
 
-            res.status(400).json({ok: false, message: 'Unauthorized user or profile'});
+            res.status(400).json({ok: false, message: 'Unauthorized user or profile with error: ' + err});
         }
     }else{
     res.status(400).json({ok: false, message: 'Incomplete data'});
