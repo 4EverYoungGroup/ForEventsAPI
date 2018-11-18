@@ -42,8 +42,8 @@ router.get('/', async (req, res, next) => {
 
 router.put('/:id', async (req,res, next) =>{
     const name = req.query.name;
-    const _id = req.param.id;
-        if (name && id){
+    const _id = req.params.id;
+        if (name && _id){
             try{
                 const eventTypeUpdated = await Event_type.findOneAndUpdate({_id: _id}, {$set: {name: name}}, {new:true}).exec();
                 res.status(200).json({ok: true, result: eventTypeUpdated});
