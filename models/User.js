@@ -356,7 +356,6 @@ function validateUser(user) {
     return Joi.validate(user, schema, { abortEarly: false });
 }
 
-
 function validateUpdatedUser(user) {
     const schema = {
         first_name: Joi
@@ -423,5 +422,4 @@ function validateUpdatedUser(user) {
 var User = mongoose.model('User', userSchema);
 
 module.exports = User;
-
 

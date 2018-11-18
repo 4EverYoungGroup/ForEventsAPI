@@ -51,7 +51,7 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
         valErrors.push({ field: 'event_id', message: 'event_id_must_be_provided' });
     } else if (Event.findOne({ _id: newMedia.event_id }), function (err, data) {
         if (err) valErrors.push({ field: 'event_id', message: 'error_accesing_database' });
-        console.log('data:' + data)
+        //console.log('data:' + data)
         if (!data) valErrors.push({ field: 'event_id', message: 'error_event_id_not_found_in_database' });
     })
 

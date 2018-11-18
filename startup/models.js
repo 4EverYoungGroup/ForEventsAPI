@@ -7,4 +7,5 @@ module.exports = function () {
     require('../models/Transaction');
     require('../models/Favorite_search');
     require('../models/Media');
+    require('../models/Province');
 }
