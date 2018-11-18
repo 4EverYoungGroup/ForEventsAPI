@@ -82,7 +82,7 @@ userSchema.statics.createRecord = function (newUser, cb) {
     }
     //control restrictions password, must include 1 letter uppercase, 1 letter lowercase and 1 digit 
     if ((typeof newUser.password != 'undefined') && !passwordSchema.validate(newUser.password)) {
-        console.log(newUser.password);
+        //console.log(newUser.password);
         valErrors.push({ field: 'password', message: 'password_not_valid_must_include_uppercase_lowercase_digits' });
     }
 
@@ -422,5 +422,6 @@ function validateUpdatedUser(user) {
 
 var User = mongoose.model('User', userSchema);
 
+module.exports = User;
 
 
