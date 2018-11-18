@@ -218,7 +218,7 @@ userSchema.statics.updateRecord = function (req, cb) {
 
 userSchema.statics.getRecord = function (req, cb) {
 
-    if (req.params.user_id != req.decoded.user._id) {
+    if (req.params.user_id != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
         return cb({ code: 403, message: 'action_not_allowed_credentials_error' })
     }
 
