@@ -30,44 +30,44 @@ require("./startup/validation")();
 
 // error handlers
 
-// development error handler
-// will print stacktrace
-// if (app.get('env') === 'development') {
-//     /*jshint unused: false*/
-//     app.use(function (err, req, res, next) {
-//         if (err.status && err.status >= 500) console.error(err);
-//         res.status(err.status || err.code || 500);
-//         if (isAPI(req)) { // llamada de API, devuelvo JSON
-//             return res.json({
-//                 ok: false,
-//                 error: { code: err.code || err.status || 500, message: err.message, err: err }
-//             });
-//         }
+//development error handler
+//will print stacktrace
+if (app.get('env') === 'development') {
+    /*jshint unused: false*/
+    app.use(function (err, req, res, next) {
+        if (err.status && err.status >= 500) console.error(err);
+        res.status(err.status || err.code || 500);
+        if (isAPI(req)) { // llamada de API, devuelvo JSON
+            return res.json({
+                ok: false,
+                error: { code: err.code || err.status || 500, message: err.message, err: err }
+            });
+        }
 
-//         res.render('error', { message: err.message, error: err });
-//     });
-//     /*jshint unused: true*/
-// }
+        res.render('error', { message: err.message, error: err });
+    });
+    /*jshint unused: true*/
+}
 
-// // production error handler
-// // no stacktraces leaked to user
-// /*jshint unused: false*/
-// app.use(function (err, req, res, next) {
-//     if (err.status && err.status >= 500) console.error(err);
-//     res.status(err.status || err.code || 500);
-//     if (isAPI(req)) { // API call? return JSON
-//         return res.json({
-//             ok: false,
-//             error: { message: err.message, err: {} }
-//         });
-//     }
+// production error handler
+// no stacktraces leaked to user
+/*jshint unused: false*/
+app.use(function (err, req, res, next) {
+    if (err.status && err.status >= 500) console.error(err);
+    res.status(err.status || err.code || 500);
+    if (isAPI(req)) { // API call? return JSON
+        return res.json({
+            ok: false,
+            error: { message: err.message, err: {} }
+        });
+    }
 
-//     res.render('error', { message: err.message, error: {} });
-// });
-// /*jshint unused: true*/
+    res.render('error', { message: err.message, error: {} });
+});
+/*jshint unused: true*/
 
-// function isAPI(req) {
-//     return req.originalUrl.indexOf('/api') === 0;
-// }
+function isAPI(req) {
+    return req.originalUrl.indexOf('/api') === 0;
+}
 
 module.exports = app;
