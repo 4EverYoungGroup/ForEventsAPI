@@ -6,6 +6,7 @@ const async = require('async');
 const Event_type = require('../../models/Event_type');
 const Event = require('../../models/Event');
 const Favorite_search = require('../../models/Favorite_search');
+const User = require('../../models/User');
 
 const mongoose = require('mongoose');
 var Schema = mongoose.Schema;
@@ -63,9 +64,10 @@ router.delete('/:id', async (req,res, next) =>{
     if (_id && admin){
         try{
             const exists = await User.userProfileS(admin, "Admin");
+
             if (exists === 1){
                 try{
-                    await Event_type.deleteEvent({_id: _id });
+                    await Event_type.remove({_id: _id }).exec();
                     return res.status(200).json({ ok: true, message: 'Event_deleted' });
                 }catch (err){
                     res.status(400).json({ok: false, message: err});
@@ -73,7 +75,8 @@ router.delete('/:id', async (req,res, next) =>{
             }else {
                 res.status(400).json({ok: false, message: 'Unauthorized user to manage events'});
             };
-        }catch{
+        }catch(err){
+
             res.status(400).json({ok: false, message: 'Unauthorized user or profile'});
         }
     }else{
