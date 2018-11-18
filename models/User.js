@@ -265,15 +265,13 @@ userSchema.statics.getList = function (filters, limit, skip, sort, fields, trans
         const result = {
             rows: rows,
         };
-        //console.log(rows.length)
 
         if (!includeTotal) return cb(null, result);
 
         // incluir propiedad total
-        User.countDocuments({}, (err, total) => {
+        User.count(filters, (err, total) => {
             if (err) return cb(err);
-
-            result.total = rows.length;
+            result.total = total;
             return cb(null, result);
         });
     });
