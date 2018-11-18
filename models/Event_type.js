@@ -78,14 +78,15 @@ event_typeSchema.statics.list = function(req, event_typeName){
         return query.exec();
         };
 
-    
+    const idname = req.query.idname;
     const name = req.query.name;
     const id = req.query.id;
     const events = req.query.events;
     const favorite_searches= req.query.favorite_searches;
+    const sort = req.query.sort;
     console.log("El nombre es:" + name)
 
-    if(name){
+    if(idname){
         const query = Event_type.findOne({'name': name});
         if(events){
             query.populate('events', events);
@@ -94,8 +95,23 @@ event_typeSchema.statics.list = function(req, event_typeName){
             query.populate('favorite_searches', favorite_searches);
        };
         return query.exec();
+    } else if(name){
+
+        const query = Event_type.find({'name': { $regex: new RegExp(name, "ig") }});
+        
+        if(events){
+            query.populate('events', events);
+        };
+       if (favorite_searches){
+            query.populate('favorite_searches', favorite_searches);
+       };
+        return query.exec();
+
     } else if (id == undefined){
         const query = Event_type.find({});
+        if(sort){
+            query.sort(sort);
+        };
         if(events){
             query.populate('events', events);
         };
@@ -105,7 +121,7 @@ event_typeSchema.statics.list = function(req, event_typeName){
     
         return query.exec();
     } else {
-        const query = Event_type.findOne({_id: event_typeID});
+        const query = Event_type.findOne({_id: id});
         if(events){
             query.populate('events', events);
         };
