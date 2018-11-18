@@ -45,7 +45,7 @@ router.put('/:id', async (req,res, next) =>{
     const _id = req.param.id;
         if (name && id){
             try{
-                const eventTypeUpdated = await Event_type.findOneAndUpdate({_id: _id}, {name: name}, {new:true}).exec();
+                const eventTypeUpdated = await Event_type.findOneAndUpdate({_id: _id}, {$set: {name: name}}, {new:true}).exec();
                 res.status(200).json({ok: true, result: eventTypeUpdated});
              } catch (err){
                 return result.status(400).json({ok: false, message: 'Error Event_type: ', err});
