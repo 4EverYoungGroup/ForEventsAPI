@@ -71,6 +71,8 @@ userSchema.statics.createRecord = function (newUser, cb) {
     //Validation with joi
     const valErrors = [];
 
+
+
     const { error } = validateUser(newUser);
     if (error) {
         error.details.map(function (err) {
@@ -79,7 +81,8 @@ userSchema.statics.createRecord = function (newUser, cb) {
         //return cb({ ok: false, errors: valErrors });
     }
     //control restrictions password, must include 1 letter uppercase, 1 letter lowercase and 1 digit 
-    if (!passwordSchema.validate(newUser.password)) {
+    if ((typeof newUser.password != 'undefined') && !passwordSchema.validate(newUser.password)) {
+        console.log(newUser.password);
         valErrors.push({ field: 'password', message: 'password_not_valid_must_include_uppercase_lowercase_digits' });
     }
 
