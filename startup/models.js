@@ -8,4 +8,5 @@ module.exports = function () {
     require('../models/Favorite_search');
     require('../models/Media');
     require('../models/Province');
+    require('../models/Country');
 }
