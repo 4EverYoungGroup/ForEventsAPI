@@ -70,6 +70,24 @@ provinceSchema.statics.getList = function (filters, limit, skip, sort, fields, i
     });
 }
 
+
+provinceSchema.statics.getRecord = function (req, cb) {
+
+    Province.findOne({ _id: req.params.province_id }, function (err, provinceDB) {
+        if (err) {
+            return cb({ code: 500, ok: false, message: 'error_accesing_data' });
+        }
+
+        if (!provinceDB) {
+            return cb({ code: 404, ok: false, message: 'province_not_exists' })
+        }
+        else {
+            return cb(null, provinceDB)
+        }
+    })
+
+}
+
 var Province = mongoose.model('Province', provinceSchema);
 
 module.exports = Province;

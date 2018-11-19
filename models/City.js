@@ -9,71 +9,76 @@ var Schema = mongoose.Schema;
 //first, we created the scheme
 const citySchema = Schema({
     _id: Schema.Types.ObjectId,
-    city: {type: String, index: true},
-    province: {type: String, index: true},
-    country: {type: String, index: true},
+    city: { type: String, index: true },
+    province: { type: String, index: true },
+    country: { type: String, index: true },
     location: {
-        type: { type: String},
+        type: { type: String },
         coordinates: [Number]
     },
-    users: [{type: Schema.Types.ObjectId, ref: 'User'}]
+    users: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    zip_code: { type: String, index: true }
 });
 citySchema.index({ "location": "2dsphere" });
 
 
 //List Cities containt partial word in a city, province or country
-citySchema.statics.listCity = function(search){
-    let regex = new RegExp(search,'i');
+citySchema.statics.listCity = function (search) {
+    let regex = new RegExp(search, 'i');
     const query = City.find({
         $or: [
-           {'city': regex},
-           {'province': regex},
-           {'country': regex}
+            { 'city': regex },
+            { 'province': regex },
+            { 'country': regex }
         ]
-     })
+    })
     return query.exec();
 }
 
 //Search Cities for proximity
 //long = longitude, lat = latitude, discance_m = distance in meters
-citySchema.statics.nearMe = function(long, lat, distance_m){
-    const distance =  City.find({ location: { $nearSphere: {
-         $geometry: {type: 'Point', coordinates: [long, lat]},
-     $maxDistance: distance_m }
-     }});
- 
-     return distance.exec();
- }
+citySchema.statics.nearMe = function (long, lat, distance_m) {
+    const distance = City.find({
+        location: {
+            $nearSphere: {
+                $geometry: { type: 'Point', coordinates: [long, lat] },
+                $maxDistance: distance_m
+            }
+        }
+    });
+
+    return distance.exec();
+}
 
 //Insert New City
-citySchema.statics.insertCity = function(city){
+citySchema.statics.insertCity = function (city) {
     city._id = new mongoose.Types.ObjectId();
-    city.save((err, citySaved)=> {
-    if (err){
-        next(err);
-        return (err);
-    } else {
-        try{
-            return citySaved;
-        } catch (err){
-            console.log(err);
-        }       
-    } 
-});
- return city;
+    city.save((err, citySaved) => {
+        if (err) {
+            next(err);
+            return (err);
+        } else {
+            try {
+                return citySaved;
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    });
+    return city;
 }
 
 //Update list of users (Add) when insert a new User
-citySchema.statics.insertUser = function(cityId,userId){
-    City.findOneAndUpdate({_id: cityId}, 
-            { $push: { users: userId } },
-           function (error, success) {
-                 if (error) {
-                     console.log('KO' + error);
-                 } else {
-                    //console.log('OK ' + success);
-                 }
-             });
+citySchema.statics.insertUser = function (cityId, userId) {
+    City.findOneAndUpdate({ _id: cityId },
+        { $push: { users: userId } },
+        function (error, success) {
+            if (error) {
+                console.log('KO' + error);
+            } else {
+                //console.log('OK ' + success);
+            }
+        });
 }
 
 

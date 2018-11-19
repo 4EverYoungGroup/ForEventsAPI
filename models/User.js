@@ -38,17 +38,17 @@ const userSchema = mongoose.Schema({
     email: { type: String, index: true },
     password: { type: String },
     profile: { type: String, enum: Object.values(ProfileTypes), default: 'User' },
-    alias: String,
+    alias: { type: String, index: true },
     birthday_date: Date,
     gender: { type: String, enum: Object.keys(GenderTypes) },
-    address: String,
-    zip_code: String,
-    province: String,
-    country: String,
-    idn: String,
-    company_name: String,
-    mobile_number: String,
-    phone_number: String,
+    address: { type: String, index: true },
+    zip_code: { type: String, index: true },
+    province: { type: String, index: true },
+    country: { type: String, index: true },
+    idn: { type: String, index: true },
+    company_name: { type: String, index: true },
+    mobile_number: { type: String, index: true },
+    phone_number: { type: String, index: true },
     create_date: { type: Date },
     delete_date: Date,
     favorite_searches: [{ type: Schema.Types.ObjectId, ref: 'Favoritesearch' }],
@@ -174,7 +174,7 @@ userSchema.statics.updateRecord = function (req, cb) {
     }
 
     if (valErrors.length > 0) {
-        return cb({ ok: false, errors: valErrors });
+        return cb({ code: 400, ok: false, message: valErrors });
     }
 
 
@@ -365,7 +365,8 @@ function validateUpdatedUser(user) {
         last_name: Joi
             .string()
             .min(2)
-            .max(255),
+            .max(255)
+            .allow(''),
         email: Joi
             .string()
             .min(6)
@@ -379,17 +380,21 @@ function validateUpdatedUser(user) {
             .valid(Object.keys(ProfileTypes)),
         address: Joi
             .string()
-            .max(255),
+            .max(255)
+            .allow(''),
         city: Joi
             .objectId(),
         zip_code: Joi
             .string()
-            .max(20),
+            .max(20)
+            .allow(''),
         province: Joi
             .string()
-            .max(255),
+            .max(255)
+            .allow(''),
         country: Joi
             .string()
+            .allow('')
             .max(255),
         birthday_date: Joi
             .date(),
@@ -399,20 +404,25 @@ function validateUpdatedUser(user) {
         alias: Joi
             .string()
             .alphanum()
+            .allow('')
             .max(255),
         idn: Joi
             .string()
             .alphanum()
+            .allow('')
             .max(50),
         company_name: Joi
             .string()
+            .allow('')
             .max(255),
         mobile_number: Joi
             .string()
-            .regex(/^[0-9]{9}$/),
+            .regex(/^[0-9]{9}$/)
+            .allow(''),
         phone_number: Joi
             .string()
-            .regex(/^[0-9]{9}$/),
+            .regex(/^[0-9]{9}$/)
+            .allow(''),
         token: Joi
             .string()
     };

@@ -34,6 +34,15 @@ router.get('/list', function (req, res, next) {
 
 });
 
+router.get('/:country_id', function (req, res, next) {
+    Country.getRecord(req, function (err, result) {
+        if (err) {
+            return res.status(err.code).json({ ok: err.ok, message: err.message });
+        }
+        return res.status(200).json({ ok: true, message: 'country_info', country: result });
+    });
+});
+
 //Auth with JWT - ***************
 
 router.use(jwtAuth());

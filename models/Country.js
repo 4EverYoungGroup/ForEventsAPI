@@ -24,17 +24,12 @@ countrySchema.statics.createRecord = function (newCountry, cb) {
         if (err) {
             return cb(err);
         }
-
         // country already exists
         if (country) {
             return cb({ ok: false, message: 'country_already_exists' });
         } else {
-
-
             // Create country
             new Country(newCountry).save(cb);
-
-
         }
     });
 
@@ -68,6 +63,23 @@ countrySchema.statics.getList = function (filters, limit, skip, sort, fields, in
             return cb(null, result);
         });
     });
+}
+
+countrySchema.statics.getRecord = function (req, cb) {
+
+    Country.findOne({ _id: req.params.country_id }, function (err, countryDB) {
+        if (err) {
+            return cb({ code: 500, ok: false, message: 'error_accesing_data' });
+        }
+
+        if (!countryDB) {
+            return cb({ code: 404, ok: false, message: 'country_not_exists' })
+        }
+        else {
+            return cb(null, countryDB)
+        }
+    })
+
 }
 
 var Country = mongoose.model('Country', countrySchema);
