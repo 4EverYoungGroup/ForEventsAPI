@@ -13,7 +13,7 @@ var eventSchema = Schema({
     _id: Schema.Types.ObjectId,
     begin_date: {type: Date, index: true},
     end_date: {type: Date, index: true},
-    adress: String,
+    address: String,
     city: {type: String, index: true},
     zip_code: String,
     province: {type: String, index: true},
@@ -27,11 +27,12 @@ var eventSchema = Schema({
     name: {type: String, index: true},
     description: {type: String, index: true},
     deleted: {type: Date, index: true},
-    user: [{type: Schema.Types.ObjectId, ref: 'User'}],
+    users: [{type: Schema.Types.ObjectId, ref: 'User'}],
     organizer: {type: Schema.Types.ObjectId, ref: 'User'},
     event_type: {type: Schema.Types.ObjectId, ref: 'Event_type'},
-    transaction: [{type: Schema.Types.ObjectId, ref: 'Transaction'}],
+    transactions: [{type: Schema.Types.ObjectId, ref: 'Transaction'}],
     media: [{type: Schema.Types.ObjectId, ref: 'Media'}],
+    active: Boolean,
     location: {
         type: { type: String},
         coordinates: [Number]
@@ -41,7 +42,7 @@ eventSchema.index({ "location": "2dsphere" });
 
 // We create a static method to search for events
 // The search can be paged
-eventSchema.statics.list = function(filters,limit, skip, sort, fields, organizer, media, user, event_type, transaction){
+eventSchema.statics.list = function(filters,limit, skip, sort, fields, organizer, media, users, event_type, transactions){
     const query = Event.find(filters);
     query.limit (limit);
     query.skip(skip);
@@ -53,14 +54,14 @@ eventSchema.statics.list = function(filters,limit, skip, sort, fields, organizer
     if (media){
         query.populate('media', media);
     };
-    if (user){
-        query.populate('user', user);
+    if (users){
+        query.populate('users', users);
     };
     if (event_type){
         query.populate('event_type', event_type);
     }
-    if (transaction){
-        query.populate('transaction', transaction);
+    if (transactions){
+        query.populate('transactions', transactions);
     };
     return query.exec();
 }
@@ -110,10 +111,10 @@ eventSchema.statics.insertMedia = function(eventId,mediaId){
 }
 
 
-// Insert a new User into Event Update list user
+// Insert a new User into Event Update list users
 eventSchema.statics.insertUser = function(userId, eventId, cb){
     Event_type.findOneAndUpdate({_id: eventId}, 
-            { $push: { user: userId} },
+            { $push: { users: userId} },
            function (error, success) {
                  if (error) {
                     return cb({ code: 500, ok: false, message: 'error_saving_data'}); 
@@ -122,10 +123,10 @@ eventSchema.statics.insertUser = function(userId, eventId, cb){
                  }
              });
 }
-// Insert a new Transaction into Event Update list transaction
+// Insert a new Transaction into Event Update list transactions
 eventSchema.statics.insertTransaction = function(trasactionId, eventId, cb){
     Event_type.findOneAndUpdate({_id: eventId}, 
-            { $push: { transaction: trasactionId} },
+            { $push: { transactions: trasactionId} },
            function (error, success) {
                  if (error) {
                     return cb({ code: 500, ok: false, message: 'error_saving_data'}); 
