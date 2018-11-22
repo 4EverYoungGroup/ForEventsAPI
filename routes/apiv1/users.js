@@ -170,7 +170,7 @@ router.post('/register', function (req, res, next) {
 
     User.createRecord(req.body, function (err, result) {
 
-        if (err) return res.status(err.code).json({ ok: err.ok, message: err.message });
+        if (err) return res.status(400).json(err);
         //res.status(400).json(err);
 
         // user created
@@ -402,8 +402,8 @@ router.put('/:user_id', function (req, res, next) {
 
     User.updateRecord(req, function (err, result) {
         if (err) {
-            //return res.json(err);
-            return res.status(err.code).json({ ok: err.ok, message: err.message });
+            return res.json(err);
+            //return res.status(err.code).json({ ok: err.ok, message: err.message });
         }
         //user updated
         return res.status(200).json({ ok: true, message: 'user_updated', user: result });
