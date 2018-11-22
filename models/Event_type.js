@@ -84,7 +84,7 @@ event_typeSchema.statics.list = function(req, event_typeName){
     const events = req.query.events;
     const favorite_searches= req.query.favorite_searches;
     const sort = req.query.sort;
-    console.log("El nombre es:" + name)
+
 
     if(idname){
         const query = Event_type.findOne({'name': name});

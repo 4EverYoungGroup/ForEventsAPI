@@ -32,9 +32,9 @@ router.get('/', async (req, res, next) => {
         const fields = req.query.fields;
         const organizer = req.query.organizer;
         const media = req.query.media;
-        const user = req.query.user;
+        const users = req.query.users;
         const event_type = req.query.event_type;
-        const transaction = req.query.transaction;
+        const transactions = req.query.transactions;
         const filter = mainSearch(req);
         const event_typeName = req.query.event_typeName;
         if (event_typeName){
@@ -47,7 +47,7 @@ router.get('/', async (req, res, next) => {
             };
             
         };
-        const list = await Event.list(filter,limit, skip, sort, fields, organizer, media, user, event_type, transaction);
+        const list = await Event.list(filter,limit, skip, sort, fields, organizer, media, users, event_type, transactions);
         const rowsCount = await Event.countTot(filter)
        
         if (req.query.includeTotal === 'true'){
@@ -71,7 +71,7 @@ router.post('/', async(req,res,next) => {
     const filter = mainInsert(req) 
 
     if (filter[0] != null){
-        return res.json({ok: false, result: filter[0]});
+        return res.status(400).json({ok: false, result: filter[0]});
        }else{
         const valOrganizer = filter[1].organizer;
         const exists = await User.userProfileS(valOrganizer.toString(), 'Organizer');
@@ -79,7 +79,7 @@ router.post('/', async(req,res,next) => {
         //Only a Organizer rol can insert new events
         if (exists === 1){
             Event.insertEvent(filter[1], function (err, result){
-                if (err) return res.status(400).json(err);
+                if (err) return res.status(400).json({ok: false, result: err});
                 // Event created
                 // We need assign event Id into collection event_type
                 const eventId = result._id;
@@ -89,9 +89,9 @@ router.post('/', async(req,res,next) => {
                     if (resultType === 1){
                         //(event_typeId, eventId)
                         Event_type.insertEvent(event_typeId, eventId, function(err, resultInsert){
-                            if (err) return res.status(400).json(err);
+                            if (err) return res.status(400).json({ok: false, result: err});
 
-                            return res.status(200).json({ ok: true, message: 'Event_registered', data: result});
+                            return res.status(200).json({ ok: true, message: 'Event_registered', data: resultInsert});
                         });
                        
                     }else{
