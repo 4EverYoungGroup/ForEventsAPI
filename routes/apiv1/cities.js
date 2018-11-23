@@ -60,7 +60,7 @@ router.get('/', async (req, res, next) => {
         
     };
 });*/
-router.post('/', async (req, res, next) => {
+/*router.post('/', async (req, res, next) => {
     
          xlsxtojson({
             input: "./jcm_cp.xlsx", 
@@ -76,7 +76,7 @@ router.post('/', async (req, res, next) => {
           }
           );
 
-});
+});*/
 /*router.post('/insertCities', async (req, res, next) => {
     
     await fs.readFile(fichCities, {encoding: 'utf8'}, function(err, data) {
@@ -119,4 +119,3 @@ router.post('/', async (req, res, next) => {
 
 
 module.exports = router;
-
