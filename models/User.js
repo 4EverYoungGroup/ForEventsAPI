@@ -272,7 +272,7 @@ userSchema.statics.getList = function (filters, limit, skip, sort, fields, trans
         if (!includeTotal) return cb(null, result);
 
         // incluir propiedad total
-        User.count(filters, (err, total) => {
+        User.countDocuments(filters, (err, total) => {
             if (err) return cb(err);
             result.total = total;
             return cb(null, result);
@@ -302,7 +302,8 @@ function validateUser(user) {
         last_name: Joi
             .string()
             .min(2)
-            .max(255),
+            .max(255)
+            .allow(''),
         email: Joi
             .string()
             .min(6)
@@ -315,43 +316,55 @@ function validateUser(user) {
             .required(),
         profile: Joi
             .string()
-            .valid(Object.keys(ProfileTypes)),
+            .valid(Object.keys(ProfileTypes))
+            .allow(''),
         address: Joi
             .string()
-            .max(255),
+            .max(255)
+            .allow(''),
         city: Joi
             .objectId(),
         zip_code: Joi
             .string()
-            .max(20),
+            .max(20)
+            .allow(''),
         province: Joi
             .string()
-            .max(255),
+            .max(255)
+            .allow(''),
         country: Joi
             .string()
-            .max(255),
+            .max(255)
+            .allow(''),
         birthday_date: Joi
-            .date(),
+            .date()
+            .allow(''),
         gender: Joi
             .string()
+            .allow('')
             .valid(Object.keys(GenderTypes)),
         alias: Joi
             .string()
             .alphanum()
-            .max(255),
+            .max(255)
+            .allow(''),
         idn: Joi
             .string()
             .alphanum()
+            .allow('')
             .max(50),
         company_name: Joi
             .string()
+            .allow('')
             .max(255),
         mobile_number: Joi
             .string()
-            .regex(/^[0-9]{9}$/),
+            .allow('')
+            .regex(/^[0-9]{11}$/),
         phone_number: Joi
             .string()
-            .regex(/^[0-9]{9}$/)
+            .allow('')
+            .regex(/^[0-9]{11}$/)
     };
     return Joi.validate(user, schema, { abortEarly: false });
 }
@@ -400,6 +413,7 @@ function validateUpdatedUser(user) {
             .date(),
         gender: Joi
             .string()
+            .allow('')
             .valid(Object.keys(GenderTypes)),
         alias: Joi
             .string()
@@ -417,11 +431,11 @@ function validateUpdatedUser(user) {
             .max(255),
         mobile_number: Joi
             .string()
-            .regex(/^[0-9]{9}$/)
+            .regex(/^[0-9]{11}$/)
             .allow(''),
         phone_number: Joi
             .string()
-            .regex(/^[0-9]{9}$/)
+            .regex(/^[0-9]{11}$/)
             .allow(''),
         token: Joi
             .string()
