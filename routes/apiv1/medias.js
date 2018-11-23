@@ -11,6 +11,23 @@ const Media = mongoose.model('Media');
 const jwt = require('jsonwebtoken');
 const jwtAuth = require('../../lib/jwtAuth');
 
+router.get('/:event_id', function (req, res, next) {
+
+    const skip = parseInt(req.query.skip) || 0;
+    const limit = parseInt(req.query.limit) || 100; // our api retunn  max 1000 registers
+    const sort = req.query.sort || '-border';
+    const includeTotal = req.query.includeTotal === 'true';
+    const fields = req.query.fields || 'name description url media_type poster';
+    const filters = { event_id: req.params.event_id }
+
+
+    Media.getList(filters, limit, skip, sort, fields, includeTotal, function (err, result) {
+        if (err) return res.json(err);
+        return res.json({ ok: true, result: result });
+    });
+
+});
+
 
 //Auth with JWT
 
@@ -93,6 +110,9 @@ router.post('/', function (req, res, next) {
 router.get('/mediatypes', function (req, res) {
     res.json({ ok: true, allowedTypes: Media.allowedTypes() });
 });
+
+
+
 
 
 module.exports = router;

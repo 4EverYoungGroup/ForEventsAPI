@@ -78,11 +78,11 @@ userSchema.statics.createRecord = function (newUser, cb) {
         error.details.map(function (err) {
             valErrors.push({ field: err.context.key, message: err.message });
         });
-        //return cb({ ok: false, errors: valErrors });
+
     }
     //control restrictions password, must include 1 letter uppercase, 1 letter lowercase and 1 digit 
     if ((typeof newUser.password != 'undefined') && !passwordSchema.validate(newUser.password)) {
-        //console.log(newUser.password);
+
         valErrors.push({ field: 'password', message: 'password_not_valid_must_include_uppercase_lowercase_digits' });
     }
 
@@ -248,20 +248,20 @@ userSchema.statics.getRecord = function (req, cb) {
 
 // We create a static method to search for users
 // The search can be paged and ordered
-userSchema.statics.getList = function (filters, limit, skip, sort, fields, transaction, favorite_searches, city, events, includeTotal, cb) {
+userSchema.statics.getList = function (filters, limit, skip, sort, fields, includeTotal, cb) {
 
 
-
-    const query = User.find(filters);
+    //filters = {};
+    const query = User.find(filters)
     query.limit(limit);
     query.skip(skip);
     query.sort(sort);
     query.select(fields);
+    query.populate({ path: 'city', match: { province: { $regex: new RegExp('mad', "ig") } } });
 
-    query.populate('favorite_searches');
-    query.populate('transactions');
-    query.populate('events');
-    query.populate('city');
+    //query.populate({ path: 'city', match: { province: { $regex: new RegExp('mad', "ig") } } });
+
+    //console.log(filters);
     return query.exec(function (err, rows) {
         if (err) return cb(err);
 

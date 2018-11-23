@@ -421,15 +421,11 @@ router.get('/list', function (req, res, next) {
     const sort = req.query.sort || '_id';
     const includeTotal = req.query.includeTotal === 'true';
     const fields = req.query.fields || 'first_name last_name profile email';
-    const transaction = req.query.transaction;
-    const favorite_searches = req.query.favorite_searches;
-    const city = req.query.city;
-    const events = req.query.events;
+
     const filters = constructSearchFilter(req);
 
+    User.getList(filters, limit, skip, sort, fields, includeTotal, function (err, result) {
 
-
-    User.getList(filters, limit, skip, sort, fields, transaction, favorite_searches, city, events, includeTotal, function (err, result) {
         if (err) return res.json(err);
         return res.json({ ok: true, result: result });
     });
