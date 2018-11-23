@@ -5,10 +5,10 @@ const router = express.Router();
 const async = require('async');
 const User = require('../../models/User');
 const City = require('../../models/City');
-const fs = require('fs');
-const path = require('path'); 
-const xlsxtojson = require("xlsx-to-json");
-const fichCities = path.join('./', 'output.json');
+//const fs = require('fs');
+//const path = require('path'); 
+//const xlsxtojson = require("xlsx-to-json");
+//const fichCities = path.join('./', 'output.json');
 
 
 //const xlstojson = require("xls-to-json");
