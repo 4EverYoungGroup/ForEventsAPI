@@ -69,13 +69,11 @@ router.get('/', async (req, res, next) => {
 router.post('/', async(req,res,next) => {
     //Create an Event in memory
     const filter = mainInsert(req) 
-
     if (filter[0] != null){
         return res.status(400).json({ok: false, result: filter[0]});
        }else{
         const valOrganizer = filter[1].organizer;
         const exists = await User.userProfileS(valOrganizer.toString(), 'Organizer');
-        
         //Only a Organizer rol can insert new events
         if (exists === 1){
             Event.insertEvent(filter[1], function (err, result){
@@ -91,20 +89,20 @@ router.post('/', async(req,res,next) => {
                         Event_type.insertEvent(event_typeId, eventId, function(err, resultInsert){
                             if (err) return res.status(400).json({ok: false, result: err});
 
-                            return res.status(200).json({ ok: true, message: 'Event_registered', data: resultInsert});
+                            return res.status(200).json({ ok: true, message: 'Event_registered', data: result});
                         });
                        
                     }else{
-                        res.status(400).json({ok: false, message: 'Event_type not found'});
+                        return res.status(400).json({ok: false, message: 'Event_type not found'});
                     };    
                 });
                 
                 } else {
-                    res.status(400).json({ok: false, message: 'Event_type not found'});
+                   return res.status(400).json({ok: false, message: 'Event_type not found'});
                 };       
            });
         }else{
-            res.status(400).json({ok: false, message: 'Unauthorized user to manage events'});
+            return res.status(400).json({ok: false, message: 'Unauthorized user to manage events'});
         };
        };
   });
