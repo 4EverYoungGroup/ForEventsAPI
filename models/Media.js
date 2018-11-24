@@ -73,19 +73,35 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
         return cb({ ok: false, errors: valErrors });
     }
 
+    if (newMedia.media_type === MediaTypes.video) {  //only media picture can set poster to true
+        newMedia.poster = false;
+    }
+
     const media = new Media({
         name: newMedia.name,
         description: newMedia.description || '',
         url: newMedia.url,
         media_type: MediaTypes[newMedia.media_type],
-        event_id: newMedia.event_id
+        event_id: newMedia.event_id,
+        poster: newMedia.poster
     })
+
+    //we have to unset the media picture with poster to true , only one media picture with poster to true
+    if (newMedia.poster) {
+        Media.findOneAndUpdate({ event_id: newMedia.event_id, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
+            if (err) {
+                return cb({ code: 500, ok: false, message: 'error_updating_previos_picture_poster' });
+            }
+        });
+    }
 
     media.save((err, doc) => {
         if (err) {
             return cb({ code: 500, ok: false, message: 'error_saving_data' });
         }
         else {
+
+
             return cb(null, doc);
         }
     })
