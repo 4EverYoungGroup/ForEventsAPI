@@ -104,6 +104,27 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
 };
 
 
+mediaSchema.statics.getRecord = function (req, cb) {
+
+
+
+    Media.findOne({ _id: req.params.media_id }, function (err, mediaDB) {
+        if (err) {
+            return cb({ code: 500, ok: false, message: 'error_accesing_data' });
+        }
+
+        if (!mediaDB) {
+            return cb({ code: 404, ok: false, message: 'media_not_exists' })
+        }
+        else {
+            return cb(null, mediaDB)
+        }
+    })
+
+}
+
+
+
 // We create a static method to search for medias
 // The search can be paged and ordered
 mediaSchema.statics.getList = function (filters, limit, skip, sort, fields, includeTotal, cb) {

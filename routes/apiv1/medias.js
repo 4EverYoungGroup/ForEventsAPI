@@ -11,7 +11,10 @@ const Media = mongoose.model('Media');
 const jwt = require('jsonwebtoken');
 const jwtAuth = require('../../lib/jwtAuth');
 
-router.get('/:event_id', function (req, res, next) {
+//Auth with JWT
+router.use(jwtAuth());
+
+router.get('/list/:event_id', function (req, res, next) {
 
     const skip = parseInt(req.query.skip) || 0;
     const limit = parseInt(req.query.limit) || 100; // our api retunn  max 1000 registers
@@ -34,9 +37,7 @@ router.get('/:event_id', function (req, res, next) {
 });
 
 
-//Auth with JWT
 
-router.use(jwtAuth());
 
 
 /**
@@ -106,7 +107,7 @@ router.post('/', function (req, res, next) {
         if (err) return res.status(400).json(err);
 
 
-        // user created
+        // media created
         return res.status(200).json({ ok: true, message: 'media_registered', data: result });
     });
 });
@@ -123,11 +124,20 @@ router.put('/:media_id', function (req, res, next) {
             return res.json(err);
 
         }
-        //user updated
+        //media updated
         return res.status(200).json({ ok: true, message: 'media_updated', user: result });
     });
 });
 
 
+router.get('/:media_id', function (req, res, next) {
+    Media.getRecord(req, function (err, result) {
+        if (err) {
+            return res.status(err.code).json({ ok: err.ok, message: err.message });
+        }
+        //media recovered
+        return res.status(200).json({ ok: true, message: 'media_info', media: result });
+    });
+});
 
 module.exports = router;
