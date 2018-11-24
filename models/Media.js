@@ -221,6 +221,27 @@ mediaSchema.statics.updateRecord = function (req, cb) {
     });
 };
 
+mediaSchema.statics.deleteRecord = function (req, cb) {
+
+    Media.findOne({ _id: req.params.media_id }, function (err, DeletedMedia) {
+        if (err) {
+            return cb({ code: 500, ok: false, message: 'error_accesing_data' });
+        }
+
+        if (!DeletedMedia) {
+            return cb({ code: 404, ok: false, message: 'media_not_exist' })
+        }
+        else {
+            if (DeletedMedia.poster) {
+                return cb({ code: 400, ok: false, message: 'delete_not_allowed_mark_another_media_poster_true_previously' })
+            }
+            DeletedMedia.remove(cb);
+        }
+    })
+
+
+}
+
 function validateMedia(media) {
     const schema = {
         name: Joi

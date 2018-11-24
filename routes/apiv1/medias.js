@@ -36,10 +36,6 @@ router.get('/list/:event_id', function (req, res, next) {
 
 });
 
-
-
-
-
 /**
  *
  * @api {post} /medias/ post
@@ -137,6 +133,17 @@ router.get('/:media_id', function (req, res, next) {
         }
         //media recovered
         return res.status(200).json({ ok: true, message: 'media_info', media: result });
+    });
+});
+
+
+router.delete('/:media_id', function (req, res, next) {
+    Media.deleteRecord(req, function (err) {
+        if (err) {
+            return res.status(err.code).json({ ok: err.ok, message: err.message });
+        }
+        //media deleted
+        return res.status(204).json({ ok: true, message: 'media_deleted' });
     });
 });
 
