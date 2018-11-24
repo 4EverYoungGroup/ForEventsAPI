@@ -146,7 +146,7 @@ userSchema.statics.deleteRecord = function (req, cb) {
 }
 
 userSchema.statics.updateRecord = function (req, cb) {
-    console.log('req.params._id: ' + req.params.user_id + ' req.decoded._id: ' + req.decoded.user._id);
+    //console.log('req.params._id: ' + req.params.user_id + ' req.decoded._id: ' + req.decoded.user._id);
 
     if (req.params.user_id != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
         return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })

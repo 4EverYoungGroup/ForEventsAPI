@@ -17,10 +17,15 @@ router.get('/:event_id', function (req, res, next) {
     const limit = parseInt(req.query.limit) || 100; // our api retunn  max 1000 registers
     const sort = req.query.sort || '-border';
     const includeTotal = req.query.includeTotal === 'true';
+    const poster = req.query.poster;
     const fields = req.query.fields || 'name description url media_type poster';
     const filters = { event_id: req.params.event_id }
 
+    if (poster) {
+        filters.poster = poster;
+    }
 
+    console.log(filters)
     Media.getList(filters, limit, skip, sort, fields, includeTotal, function (err, result) {
         if (err) return res.json(err);
         return res.json({ ok: true, result: result });
@@ -111,7 +116,17 @@ router.get('/mediatypes', function (req, res) {
     res.json({ ok: true, allowedTypes: Media.allowedTypes() });
 });
 
+router.put('/:media_id', function (req, res, next) {
 
+    Media.updateRecord(req, function (err, result) {
+        if (err) {
+            return res.json(err);
+
+        }
+        //user updated
+        return res.status(200).json({ ok: true, message: 'media_updated', user: result });
+    });
+});
 
 
 

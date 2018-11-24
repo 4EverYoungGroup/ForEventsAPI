@@ -4,20 +4,20 @@ const mongoose = require('mongoose');
 const Event = require('./Event');
 
 const Joi = require('joi'); //validate data provided API
-
-//const Event = mongoose.model('Event');
+const v = require('validator');
 
 const MediaTypes = Object.freeze({
     picture: 'picture',
     video: 'video'
 });
 
+var Schema = mongoose.Schema;
 
 const mediaSchema = mongoose.Schema({
-    name: { type: String, index: true },
+    name: { type: String, index: true, required: true },
     description: { type: String, index: true },
-    url: { type: String, index: true },
-    event_id: { type: mongoose.Schema.Types.ObjectId, required: true },
+    url: { type: String, index: true, required: true },
+    event_id: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
     media_type: { type: String, required: true, enum: Object.values(MediaTypes), index: true },
     poster: { type: Boolean, index: true, default: false }
 });
@@ -46,28 +46,24 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
 
 
     // verification url
-    // if (typeof newMedia.url == 'undefined') {
-    //     valErrors.push({ field: 'url', message: 'url_must_be_provided' });
-    // }
-    // else if (v.isEmpty(newMedia.url) || !v.isURL(newMedia.url)) {
-    //     valErrors.push({ field: 'url', message: 'url_malformed' });
-    // }
-    //console.log(newMedia.event_id)
+    if (v.isEmpty(newMedia.url) || !v.isURL(newMedia.url)) {
+        valErrors.push({ field: 'url', message: 'url_malformed' });
+    }
+
     // verification event_id
     // if (typeof newMedia.event_id == 'undefined') {
     //     valErrors.push({ field: 'event_id', message: 'event_id_must_be_provided' });
     // } else if (Event.findOne({ _id: newMedia.event_id }), function (err, data) {
     //     if (err) valErrors.push({ field: 'event_id', message: 'error_accesing_database' });
-    //     //console.log('data:' + data)
+
     //     if (!data) valErrors.push({ field: 'event_id', message: 'error_event_id_not_found_in_database' });
     // })
 
-    //verificaciont media_type
-    // if (typeof newMedia.media_type == 'undefined') {
-    //     valErrors.push({ field: 'media_type', message: 'media_type_not_defined' });
-    // } else if (typeof MediaTypes[newMedia.media_type] == 'undefined') {
-    //     valErrors.push({ field: 'media_type', message: 'media_type_provide_not_valid' });
-    // }
+    // Event.findById(newMedia.event_id, function (err, data) {
+    //     if (err) valErrors.push({ field: 'event_id', message: 'error_accesing_database' });
+    //     //console.log('data:' + data)
+    //     if (!data) valErrors.push({ field: 'event_id', message: 'error_event_id_not_found_in_database' });
+    // })
 
     if (valErrors.length > 0) {
         return cb({ ok: false, errors: valErrors });
@@ -87,7 +83,7 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
     })
 
     //we have to unset the media picture with poster to true , only one media picture with poster to true
-    if (newMedia.poster) {
+    if (newMedia.poster && newMedia.media_type === MediaTypes.picture) {
         Media.findOneAndUpdate({ event_id: newMedia.event_id, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
             if (err) {
                 return cb({ code: 500, ok: false, message: 'error_updating_previos_picture_poster' });
@@ -138,6 +134,72 @@ mediaSchema.statics.getList = function (filters, limit, skip, sort, fields, incl
     })
 }
 
+mediaSchema.statics.updateRecord = function (req, cb) {
+
+    // if (req.params.user_id != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
+    //     return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
+
+    // }
+
+    //Validation with joi
+    const valErrors = [];
+
+    //console.log(Object.keys(req.body).length)
+    if (((typeof req.body.token != 'undefined') && Object.keys(req.body).length == 1) || Object.keys(req.body).length < 1) {
+        valErrors.push({ field: 'none', message: 'nothing_to_update' });
+    }
+
+    const { error } = validateUpdatedMedia(req.body);
+    if (error) {
+        error.details.map(function (err) {
+            valErrors.push({ field: err.context.key, message: err.message });
+        });
+    }
+
+
+    if (valErrors.length > 0) {
+        return cb({ code: 400, ok: false, message: valErrors });
+    }
+
+    console.log(req.params.media_id)
+    // Find media
+    Media.findOne({ _id: req.params.media_id }, function (err, updatedMedia) {
+
+        if (err) {
+            return cb({ code: 500, ok: false, message: 'error_accesing_data' });
+        }
+
+        if (!updatedMedia) {
+            return cb({ code: 404, ok: false, message: 'media_not_exist' });
+        }
+        else {
+
+            updatedMedia.name = req.body.name;
+            updatedMedia.description = req.body.description;
+            updatedMedia.url = req.body.url;
+            updatedMedia.media_type = req.body.media_type;
+            if (req.body.media_type === MediaTypes.picture) {
+                updatedMedia.poster = req.body.poster;
+            } else {
+                updatedMedia.poster = false;
+            }
+
+            if (req.body.poster && req.body.media_type === MediaTypes.picture) {
+                Media.findOneAndUpdate({ event_id: updatedMedia.event_id, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
+                    if (err) {
+                        return cb({ code: 500, ok: false, message: 'error_updating_previos_picture_poster' });
+                    }
+                });
+            }
+
+
+            //update user
+            updatedMedia.save();
+            return cb(null, updatedMedia);
+        }
+    });
+};
+
 function validateMedia(media) {
     const schema = {
         name: Joi
@@ -158,7 +220,35 @@ function validateMedia(media) {
             .valid(Object.keys(MediaTypes))
             .required(),
         event_id: Joi
-            .objectId(),
+            .objectId()
+            .required(),
+        poster: Joi
+            .boolean(),
+        token: Joi
+            .string()
+    };
+    return Joi.validate(media, schema, { abortEarly: false });
+}
+
+function validateUpdatedMedia(media) {
+    const schema = {
+        name: Joi
+            .string()
+            .min(5)
+            .max(150)
+            .required(),
+        description: Joi
+            .string()
+            .max(255)
+            .allow(''),
+        url: Joi
+            .string()
+            .required()
+            .uri(),
+        media_type: Joi
+            .string()
+            .valid(Object.keys(MediaTypes))
+            .required(),
         poster: Joi
             .boolean(),
         token: Joi
