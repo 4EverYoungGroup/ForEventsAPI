@@ -5,13 +5,7 @@ const router = express.Router();
 const async = require('async');
 const User = require('../../models/User');
 const City = require('../../models/City');
-//const fs = require('fs');
-//const path = require('path'); 
-//const xlsxtojson = require("xlsx-to-json");
-//const fichCities = path.join('./', 'output.json');
 
-
-//const xlstojson = require("xls-to-json");
 
 const mongoose = require('mongoose');
 var Schema = mongoose.Schema;
@@ -26,12 +20,30 @@ router.get('/', async (req, res, next) => {
         const fields = req.query.fields;
         var list = await City.listCity(queryText, limit, nearMe, fields);
         if(list.code){res.json({ok: false, result: list});};
-        res.json({ok: true, result: list});
-} catch (err){
-    next(err);
-}
+        res.status(200).json({ok: true, result: list});
+    } catch (err){
+        res.status(400).json({ok: false, result: err});
+    }
 });
 
+router.get('/provinces', async (req, res, next) => {
+    try{
+        const country = req.query.country;
+        var list = await City.listProvince(country);
+        res.status(200).json({ok: true, result: list});
+    } catch (err){
+        res.status(400).json({ok: false, result: err});
+    }
+});
+
+router.get('/countries', async (req, res, next) => {
+    try{
+        var list = await City.listCountries();
+        res.status(200).json({ok: true, result: list});
+    } catch (err){
+        res.status(400).json({ok: false, result: err});
+    }
+});
 
 // Insert New City
 /*router.post('/',  (req,res,next) => {
@@ -60,62 +72,6 @@ router.get('/', async (req, res, next) => {
         
     };
 });*/
-/*router.post('/', async (req, res, next) => {
-    
-         xlsxtojson({
-            input: "./jcm_cp.xlsx", 
-            output: "output.json",
-            lowerCaseHeaders:true
-          },
-          function(err, result){
-              if(err){
-                res.json(err)
-              } else{
-                  res.json(result)
-              }
-          }
-          );
-
-});*/
-/*router.post('/insertCities', async (req, res, next) => {
-    
-    await fs.readFile(fichCities, {encoding: 'utf8'}, function(err, data) {
-        if (err) {
-            console.log(err);
-            return (err);
-        }
-        try {
-            data = JSON.parse(data);
-            console.log("data ok");
-        } catch (err) {
-            console.log('data',err)
-            return (err);
-        }
-        async.each(data.cities, (function(item) {
-            var city = new City({
-                _id: new mongoose.Types.ObjectId(),
-                city: item.city,
-                province: item.province,
-                country: item.country,
-                zip_code: item.zip_code,
-                location: {
-                    type: 'Point',
-                    coordinates: [item.longitude, item.latitude]
-                }     
-            }).save(function(err, nuevoAnuncio) {
-                if (err) {
-                   console.log('Error al crear anuncio', err);
-                   return (err);
-               }
-                console.log('Anuncio ' +  ' creado');
-            });
-        }));
-        //Mongoose.close();
-        return (null, 'altaAnuncios');          
-    });
-
-});*/
-//"zip_code":"04567"},{"country":"España","province":"ALMERÍA","city":"ALHAMA DE ALMERIA","latitude":"36.95742","longitude":"-2.570075"
 
 
 module.exports = router;
