@@ -103,7 +103,7 @@ eventSchema.statics.insertMedia = function(eventId,mediaId, cb){
             { $push: { media: mediaId } },
            function (error, success) {
                  if (error) {
-                    return cb({ code: 500, ok: false, message: 'error_saving_data'}); 
+                    return cb({ code: 400, ok: false, message: 'error_saving_data'}); 
                  } else {
                     return cb(null,success);
                  }
@@ -112,24 +112,24 @@ eventSchema.statics.insertMedia = function(eventId,mediaId, cb){
 
 
 // Insert a new User into Event Update list users
-eventSchema.statics.insertUser = function(userId, eventId, cb){
-    Event_type.findOneAndUpdate({_id: eventId}, 
+eventSchema.statics.insertUser = function(eventId,userId, cb){
+    Event.findOneAndUpdate({_id: eventId}, 
             { $push: { users: userId} },
            function (error, success) {
                  if (error) {
-                    return cb({ code: 500, ok: false, message: 'error_saving_data'}); 
+                    return cb({ code: 400, ok: false, message: 'error_saving_data'}); 
                 } else {
                     return cb(null,success);
                  }
              });
 }
 // Insert a new Transaction into Event Update list transactions
-eventSchema.statics.insertTransaction = function(trasactionId, eventId, cb){
-    Event_type.findOneAndUpdate({_id: eventId}, 
+eventSchema.statics.insertTransaction = function(eventId, trasactionId, cb){
+    Event.findOneAndUpdate({_id: eventId}, 
             { $push: { transactions: trasactionId} },
            function (error, success) {
                  if (error) {
-                    return cb({ code: 500, ok: false, message: 'error_saving_data'}); 
+                    return cb({ code: 400, ok: false, message: 'error_saving_data'}); 
                 } else {
                     return cb(null,success);
                  }
