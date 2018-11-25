@@ -29,7 +29,6 @@ router.get('/list/:event_id', function (req, res, next) {
         filters.poster = poster;
     }
 
-
     Media.getList(filters, limit, skip, sort, fields, includeTotal, function (err, result) {
         if (err) return res.json(err);
         return res.json({ ok: true, result: result });
@@ -99,13 +98,33 @@ router.get('/list/:event_id', function (req, res, next) {
  */
 
 router.post('/', function (req, res, next) {
+
+    // if (mongoose.Types.ObjectId.isValid(req.body.event_id)) {
+    //     Event.findById(req.body.event_id, function (err, data) {
+    //         if (err) next(err); //{ ok: false, message: 'error_accesing_database' });
+    //         //         // if not existe return error 404
+    //         console.log(data)
+    //         if (!data) next({ ok: false, message: 'event_not_exist' });
+    //     });
+    //     // }
+    //     // else {
+    //     //     return res.status(400).json({ ok: false, message: 'event_format_invalid' });
+    // }
+
+    // console.log('entro medias post')
+
     Media.createRecord(req.body, function (err, result) {
 
         if (err) return res.status(400).json(err);
 
-        Event.insertMedia(req.body.event_id, result._id);
-
         // media created
+        //insert new media in event collection
+        Event.insertMedia(req.body.event_id, result._id, function (errInsert, resultInsert) {
+            if (errInsert) {
+                return res.status(errInsert.code).json({ ok: errInsert.ok, message: errInsert.message });
+            }
+        });
+
         return res.status(200).json({ ok: true, message: 'media_registered', data: result });
     });
 });

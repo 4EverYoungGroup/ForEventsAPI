@@ -18,7 +18,6 @@ const transactionSchema = Schema({
 });
 
 
-
 transactionSchema.statics.exists = function (idTransaction, cb) {
     Transaction.findById(idTransaction, function (err, transaction) {
         if (err) return cb(err);
@@ -51,14 +50,6 @@ transactionSchema.statics.createRecord = function (newTransaction, cb) {
             return cb({ ok: false, message: 'user_already_registered_for_event' });
         }
         else {
-            // User.findOne({ _id: newTransaction.user }, function (errUser, userDB) {
-            //     if (errUser) return cb(errUser);
-            //     if (!userDB) return cb({ ok: false, code: 404, message: 'user_not_exist' });
-            //     return userDB
-            // })
-
-            //TODO: Verify user and event exist in database
-
             //Create Transaction
             new Transaction(newTransaction).save(cb);
         }
@@ -79,7 +70,7 @@ transactionSchema.statics.deleteRecord = function (req, cb) {
 
             if (DeletedTransaction.user != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
                 return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
-            }s
+            } s
             DeletedTransaction.remove(cb);
         }
     })

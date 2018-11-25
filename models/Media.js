@@ -44,26 +44,10 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
 
     }
 
-
     // verification url
     if (v.isEmpty(newMedia.url) || !v.isURL(newMedia.url)) {
         valErrors.push({ field: 'url', message: 'url_malformed' });
     }
-
-    // verification event_id
-    // if (typeof newMedia.event_id == 'undefined') {
-    //     valErrors.push({ field: 'event_id', message: 'event_id_must_be_provided' });
-    // } else if (Event.findOne({ _id: newMedia.event_id }), function (err, data) {
-    //     if (err) valErrors.push({ field: 'event_id', message: 'error_accesing_database' });
-
-    //     if (!data) valErrors.push({ field: 'event_id', message: 'error_event_id_not_found_in_database' });
-    // })
-
-    // Event.findById(newMedia.event_id, function (err, data) {
-    //     if (err) valErrors.push({ field: 'event_id', message: 'error_accesing_database' });
-    //     //console.log('data:' + data)
-    //     if (!data) valErrors.push({ field: 'event_id', message: 'error_event_id_not_found_in_database' });
-    // })
 
     if (valErrors.length > 0) {
         return cb({ ok: false, errors: valErrors });
@@ -73,6 +57,7 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
         newMedia.poster = false;
     }
 
+    //create new media
     const media = new Media({
         name: newMedia.name,
         description: newMedia.description || '',

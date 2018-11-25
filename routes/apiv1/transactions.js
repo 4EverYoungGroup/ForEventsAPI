@@ -6,6 +6,8 @@ const router = express.Router();
 //database
 const mongoose = require('mongoose');
 const Transaction = mongoose.model('Transaction');
+const Event = mongoose.model('Event');
+const User = mongoose.model('Event');
 
 //security
 const jwt = require('jsonwebtoken');
@@ -46,9 +48,39 @@ router.get('/list', function (req, res, next) {
 
 
 router.post('/', function (req, res, next) {
+
+    // if (mongoose.Types.ObjectId.isValid(req.body.event)) {
+    //     Event.findOne({ _id: req.body.event }, function (err, data) {
+    //         if (err) return res.status(500).send({ ok: false, message: 'error_accesing_database' });
+    //         // if not existe return error 404
+    //         if (!data) return res.status(404).send({ ok: false, message: 'event_not_exist' });
+    //     });
+    // }
+    // else {
+    //     return res.status(400).json({ ok: false, message: 'event_format_invalid' });
+    // }
+
+    // if (mongoose.Types.ObjectId.isValid(req.body.user)) {
+    //     User.findOne({ _id: req.body.user }, function (err, data) {
+    //         if (err) return res.status(500).json({ ok: false, message: 'error_accesing_database' });
+    //         // if not existe return error 404
+    //         if (!data) return res.status(404).json({ ok: false, message: 'user_not_exist' });
+    //     });
+    // }
+    // else {
+    //     return res.status(400).json({ ok: false, message: 'user_format_invalid' });
+    // }
+
+
     Transaction.createRecord(req.body, function (err, result) {
         if (err) return res.status(400).json(err);
         // transaction created
+        Event.insertTransaction(req.body.event, result._id, function (errInsert, resultInsert) {
+            if (errInsert) {
+                return res.status(errInsert.code).json({ ok: errInsert.ok, message: errInsert.message });
+            }
+        });
+
         return res.status(200).json({ ok: true, message: 'transaction_registered', data: result });
     });
 });
