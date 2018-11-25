@@ -9,4 +9,5 @@ module.exports = function () {
     require('../models/Media');
     require('../models/Province');
     require('../models/Country');
+    require('../models/Transaction');
 }

@@ -28,7 +28,7 @@ router.get('/list/:event_id', function (req, res, next) {
         filters.poster = poster;
     }
 
-    console.log(filters)
+
     Media.getList(filters, limit, skip, sort, fields, includeTotal, function (err, result) {
         if (err) return res.json(err);
         return res.json({ ok: true, result: result });

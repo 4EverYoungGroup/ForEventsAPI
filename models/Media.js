@@ -195,6 +195,8 @@ mediaSchema.statics.updateRecord = function (req, cb) {
         }
         else {
 
+            //TODO: test if media you try to update is yours or your are an admin
+
             updatedMedia.name = req.body.name;
             updatedMedia.description = req.body.description;
             updatedMedia.url = req.body.url;
@@ -214,7 +216,7 @@ mediaSchema.statics.updateRecord = function (req, cb) {
             }
 
 
-            //update user
+            //update media
             updatedMedia.save();
             return cb(null, updatedMedia);
         }
