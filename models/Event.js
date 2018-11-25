@@ -98,14 +98,14 @@ eventSchema.statics.insertEvent = function(event,cb){
 });
 }
 //Update list of Media (Add) when insert a new Media
-eventSchema.statics.insertMedia = function(eventId,mediaId){
+eventSchema.statics.insertMedia = function(eventId,mediaId, cb){
     Event.findOneAndUpdate({_id: eventId}, 
             { $push: { media: mediaId } },
            function (error, success) {
                  if (error) {
-                    return(error);
+                    return cb({ code: 500, ok: false, message: 'error_saving_data'}); 
                  } else {
-                    return success;
+                    return cb(null,success);
                  }
              });
 }
