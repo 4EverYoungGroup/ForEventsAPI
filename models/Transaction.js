@@ -79,8 +79,7 @@ transactionSchema.statics.deleteRecord = function (req, cb) {
 
             if (DeletedTransaction.user != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
                 return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
-            }
-
+            }s
             DeletedTransaction.remove(cb);
         }
     })

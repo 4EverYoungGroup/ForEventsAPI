@@ -6,6 +6,7 @@ const router = express.Router();
 //database
 const mongoose = require('mongoose');
 const Media = mongoose.model('Media');
+const Event = mongoose.model('Event');
 
 //security
 const jwt = require('jsonwebtoken');
@@ -102,6 +103,7 @@ router.post('/', function (req, res, next) {
 
         if (err) return res.status(400).json(err);
 
+        Event.insertMedia(req.body.event_id, result._id);
 
         // media created
         return res.status(200).json({ ok: true, message: 'media_registered', data: result });
