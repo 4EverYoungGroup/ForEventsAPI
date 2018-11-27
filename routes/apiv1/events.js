@@ -36,6 +36,11 @@ router.get('/', async (req, res, next) => {
         const event_type = req.query.event_type;
         const transactions = req.query.transactions;
         const filter = mainSearch(req);
+        const favorite = req.query.favorite;
+        const userId = req.query.userId;
+        if (favorite && userId){
+            // TODO save the query filter
+        };
         const event_typeName = req.query.event_typeName;
         if (event_typeName){
             
@@ -141,7 +146,7 @@ router.delete('/:id', async (req,res, next) =>{
             }else {
                 res.status(400).json({ok: false, message: 'Unauthorized user to manage events'});
             };
-        }catch{
+        }catch(err){
             res.status(400).json({ok: false, message: 'Unauthorized user or profile'});
         }
     }else{
