@@ -15,10 +15,15 @@ var Schema = mongoose.Schema;
 router.get('/', async (req, res, next) => {
     try{
         const queryText = req.query.queryText;
+        const city = req.query.city;
+        const province = req.query.province;
+        const country =  req.query.country;
+        const zip_code = req.query.zip_code;
         const limit = parseInt(req.query.limit) || 25;
         const nearMe = req.query.nearMe;
         const fields = req.query.fields;
-        var list = await City.listCity(queryText, limit, nearMe, fields);
+
+        var list = await City.listCity(queryText,city,province,country,zip_code,limit, nearMe, fields);
         if(list.code){res.json({ok: false, result: list});};
         res.status(200).json({ok: true, result: list});
     } catch (err){
