@@ -18,7 +18,21 @@ const jwtAuth = require('../../lib/jwtAuth');
 //Auth with JWT
 router.use(jwtAuth());
 
-router.get('/list/:event_id', function (req, res, next) {
+router.get('/list/:event_id', async (req, res, next) => {
+
+    //validation format
+    var valErrors = [];
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.event_id))
+        return res.status(400).json({ ok: false, errors: 'event_format_is_not_correct' });
+
+    //validation existance of event 
+    const event = await Event.findById(req.params.event_id);
+    if (!event) valErrors.push({ ok: false, message: 'event_not_exists' });
+
+    if (valErrors.length > 0) {
+        return res.status(400).json({ ok: false, errors: valErrors });
+    }
 
     const skip = parseInt(req.query.skip) || 0;
     const limit = parseInt(req.query.limit) || 100; // our api retunn  max 1000 registers
@@ -26,7 +40,7 @@ router.get('/list/:event_id', function (req, res, next) {
     const includeTotal = req.query.includeTotal === 'true';
     const poster = req.query.poster;
     const fields = req.query.fields || 'name description url media_type poster';
-    const filters = { event_id: req.params.event_id }
+    const filters = { event: req.params.event_id }
 
     if (poster) {
         filters.poster = poster;
@@ -105,11 +119,11 @@ router.post('/', async (req, res, next) => {
     //validation format
     var valErrors = [];
 
-    if (!mongoose.Types.ObjectId.isValid(req.body.event_id))
-        return res.status(400).json({ ok: false, errors: 'event_id_format_is_not_correct' });
+    if (!mongoose.Types.ObjectId.isValid(req.body.event))
+        return res.status(400).json({ ok: false, errors: 'event_format_is_not_correct' });
 
     //validation existance of event and user
-    const event = await Event.findById(req.body.event_id);
+    const event = await Event.findById(req.body.event);
     if (!event) valErrors.push({ ok: false, message: 'event_not_exists' });
 
     if (valErrors.length > 0) {
@@ -122,7 +136,7 @@ router.post('/', async (req, res, next) => {
 
         // media created
         //insert new media in event collection
-        Event.insertMedia(req.body.event_id, result._id, function (errInsert, resultInsert) {
+        Event.insertMedia(req.body.event, result._id, function (errInsert, resultInsert) {
             if (errInsert) {
                 return res.status(errInsert.code).json({ ok: errInsert.ok, message: errInsert.message });
             }

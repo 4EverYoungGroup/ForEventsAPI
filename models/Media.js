@@ -17,7 +17,7 @@ const mediaSchema = mongoose.Schema({
     name: { type: String, index: true, required: true },
     description: { type: String, index: true },
     url: { type: String, index: true, required: true },
-    event_id: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
+    event: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
     media_type: { type: String, required: true, enum: Object.values(MediaTypes), index: true },
     poster: { type: Boolean, index: true, default: false }
 });
@@ -63,26 +63,30 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
         description: newMedia.description || '',
         url: newMedia.url,
         media_type: MediaTypes[newMedia.media_type],
-        event_id: newMedia.event_id,
+        event: newMedia.event,
         poster: newMedia.poster
     })
 
     //we have to unset the media picture with poster to true , only one media picture with poster to true
     if (newMedia.poster && newMedia.media_type === MediaTypes.picture) {
-        Media.findOneAndUpdate({ event_id: newMedia.event_id, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
+        Media.findOneAndUpdate({ event: newMedia.event, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
             if (err) {
                 return cb({ code: 500, ok: false, message: 'error_updating_previos_picture_poster' });
             }
         });
     }
 
+    //if there is no medias registered for this event we force poster to true
+    Media.countDocuments({ event: newMedia.event }, (err, total) => {
+        if (err) return cb({ code: 500, ok: false, message: 'error_accesing_data' });
+        if (total === 0) media.poster = true;
+    });
+
     media.save((err, doc) => {
         if (err) {
             return cb({ code: 500, ok: false, message: 'error_saving_data' });
         }
         else {
-
-
             return cb(null, doc);
         }
     })
@@ -193,7 +197,7 @@ mediaSchema.statics.updateRecord = function (req, cb) {
             }
 
             if (req.body.poster && req.body.media_type === MediaTypes.picture) {
-                Media.findOneAndUpdate({ event_id: updatedMedia.event_id, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
+                Media.findOneAndUpdate({ event: updatedMedia.event, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
                     if (err) {
                         return cb({ code: 500, ok: false, message: 'error_updating_previos_picture_poster' });
                     }
@@ -248,7 +252,7 @@ function validateMedia(media) {
             .string()
             .valid(Object.keys(MediaTypes))
             .required(),
-        event_id: Joi
+        event: Joi
             .objectId()
             .required(),
         poster: Joi

@@ -281,7 +281,7 @@ userSchema.statics.getList = function (filters, limit, skip, sort, fields, inclu
 }
 
 
-//User profile 
+//Methods JOSEP
 
 userSchema.statics.userProfileS = function (userId, profile) {
     if (userId.length === 24) {
@@ -290,6 +290,20 @@ userSchema.statics.userProfileS = function (userId, profile) {
     } else {
         throw new Error('The id must contain 24 characters or not exists!');
     }
+};
+
+userSchema.statics.insertFavorite_search = function (userId, favoriteId, cb) {
+    User.findOneAndUpdate({ _id: userId }, { $push: { favorite_searches: favoriteId } }, function (error, success) {
+        if (error) { return cb({ code: 400, ok: false, message: 'error_saving_data' }); }
+        else { return cb(null, success); }
+    });
+};
+
+userSchema.statics.deleteFavorite_search = function (userId, favoriteId, cb) {
+    User.findOneAndUpdate({ _id: userId }, { $pull: { favorite_searches: favoriteId } }, { safe: true, upsert: true }, function (error, success) {
+        if (error) { return cb({ code: 400, ok: false, message: 'error_deleting_data' }); }
+        else { return cb(null, success); }
+    });
 };
 
 function validateUser(user) {
