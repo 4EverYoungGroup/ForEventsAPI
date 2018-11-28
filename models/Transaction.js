@@ -1,12 +1,14 @@
 'use strict';
 
 const mongoose = require('mongoose');
+
 const Event = require('./Event');
 const User = require('./User');
 
-const Joi = require('joi'); //validate data provided API
 
 var Schema = mongoose.Schema;
+
+
 
 
 //first, we created the scheme
@@ -17,7 +19,6 @@ const transactionSchema = Schema({
 
 });
 
-
 transactionSchema.statics.exists = function (idTransaction, cb) {
     Transaction.findById(idTransaction, function (err, transaction) {
         if (err) return cb(err);
@@ -25,23 +26,9 @@ transactionSchema.statics.exists = function (idTransaction, cb) {
     });
 };
 
-transactionSchema.statics.createRecord = function (newTransaction, cb) {
+transactionSchema.statics.createRecord = function (req, cb) {
 
-    //Validation with joi
-    const valErrors = [];
-
-    const { error } = validateTransaction(newTransaction);
-    if (error) {
-        error.details.map(function (err) {
-            valErrors.push({ field: err.context.key, message: err.message });
-        });
-    }
-
-    if (valErrors.length > 0) {
-        return cb({ ok: false, errors: valErrors });
-    }
-
-    Transaction.findOne({ event: newTransaction.event, user: newTransaction.user }, function (err, transaction) {
+    Transaction.findOne({ event: req.body.event, user: req.decoded.user._id }, function (err, transaction) {
         if (err) {
             return cb(err);
         }
@@ -51,7 +38,10 @@ transactionSchema.statics.createRecord = function (newTransaction, cb) {
         }
         else {
             //Create Transaction
-            new Transaction(newTransaction).save(cb);
+            var newTransaction = new Transaction();
+            newTransaction.event = req.body.event;
+            newTransaction.user = req.decoded.user._id;
+            newTransaction.save(cb);
         }
     });
 };
@@ -70,7 +60,7 @@ transactionSchema.statics.deleteRecord = function (req, cb) {
 
             if (DeletedTransaction.user != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
                 return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
-            } s
+            }
             DeletedTransaction.remove(cb);
         }
     })
@@ -111,6 +101,7 @@ transactionSchema.statics.getList = function (filters, limit, skip, sort, fields
     query.populate('event');
     query.populate('user');
 
+
     return query.exec(function (err, rows) {
         if (err) return cb(err);
 
@@ -127,23 +118,6 @@ transactionSchema.statics.getList = function (filters, limit, skip, sort, fields
             return cb(null, result);
         });
     })
-}
-
-// ** VALIDATION PARAMS
-
-function validateTransaction(transaction) {
-    const schema = {
-
-        event: Joi
-            .objectId()
-            .required(),
-        user: Joi
-            .objectId()
-            .required(),
-        token: Joi
-            .string()
-    };
-    return Joi.validate(transaction, schema, { abortEarly: false });
 }
 
 //Create model

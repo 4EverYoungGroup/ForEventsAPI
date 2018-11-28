@@ -8,6 +8,9 @@ const mongoose = require('mongoose');
 const Media = mongoose.model('Media');
 const Event = mongoose.model('Event');
 
+
+const Joi = require('joi'); //validate data provided API
+
 //security
 const jwt = require('jsonwebtoken');
 const jwtAuth = require('../../lib/jwtAuth');
@@ -97,21 +100,21 @@ router.get('/list/:event_id', function (req, res, next) {
  *     }
  */
 
-router.post('/', function (req, res, next) {
+router.post('/', async (req, res, next) => {
 
-    // if (mongoose.Types.ObjectId.isValid(req.body.event_id)) {
-    //     Event.findById(req.body.event_id, function (err, data) {
-    //         if (err) next(err); //{ ok: false, message: 'error_accesing_database' });
-    //         //         // if not existe return error 404
-    //         console.log(data)
-    //         if (!data) next({ ok: false, message: 'event_not_exist' });
-    //     });
-    //     // }
-    //     // else {
-    //     //     return res.status(400).json({ ok: false, message: 'event_format_invalid' });
-    // }
+    //validation format
+    var valErrors = [];
 
-    // console.log('entro medias post')
+    if (!mongoose.Types.ObjectId.isValid(req.body.event_id))
+        return res.status(400).json({ ok: false, errors: 'event_id_format_is_not_correct' });
+
+    //validation existance of event and user
+    const event = await Event.findById(req.body.event_id);
+    if (!event) valErrors.push({ ok: false, message: 'event_not_exists' });
+
+    if (valErrors.length > 0) {
+        return res.status(400).json({ ok: false, errors: valErrors });
+    }
 
     Media.createRecord(req.body, function (err, result) {
 
@@ -167,5 +170,8 @@ router.delete('/:media_id', function (req, res, next) {
         return res.status(204).json({ ok: true, message: 'media_deleted' });
     });
 });
+
+
+
 
 module.exports = router;

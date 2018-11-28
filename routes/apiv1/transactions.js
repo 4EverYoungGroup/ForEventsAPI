@@ -7,7 +7,10 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Transaction = mongoose.model('Transaction');
 const Event = mongoose.model('Event');
-const User = mongoose.model('Event');
+const User = mongoose.model('User');
+
+
+const Joi = require('joi'); //validate data provided API
 
 //security
 const jwt = require('jsonwebtoken');
@@ -22,7 +25,7 @@ router.get('/list', function (req, res, next) {
     const limit = parseInt(req.query.limit) || 100; // our api retunn  max 1000 registers
     const sort = req.query.sort || '-create_date';
     const includeTotal = req.query.includeTotal === 'true';
-    const user = req.body.user
+    const user = req.query.user
     const fields = req.query.fields || 'user event create_date';
     var filters = {}
 
@@ -47,32 +50,34 @@ router.get('/list', function (req, res, next) {
 });
 
 
-router.post('/', function (req, res, next) {
+router.post('/', async (req, res, next) => {
 
-    // if (mongoose.Types.ObjectId.isValid(req.body.event)) {
-    //     Event.findOne({ _id: req.body.event }, function (err, data) {
-    //         if (err) return res.status(500).send({ ok: false, message: 'error_accesing_database' });
-    //         // if not existe return error 404
-    //         if (!data) return res.status(404).send({ ok: false, message: 'event_not_exist' });
-    //     });
-    // }
-    // else {
-    //     return res.status(400).json({ ok: false, message: 'event_format_invalid' });
-    // }
+    //validation format
+    var valErrors = [];
 
-    // if (mongoose.Types.ObjectId.isValid(req.body.user)) {
-    //     User.findOne({ _id: req.body.user }, function (err, data) {
-    //         if (err) return res.status(500).json({ ok: false, message: 'error_accesing_database' });
-    //         // if not existe return error 404
-    //         if (!data) return res.status(404).json({ ok: false, message: 'user_not_exist' });
-    //     });
-    // }
-    // else {
-    //     return res.status(400).json({ ok: false, message: 'user_format_invalid' });
-    // }
+    const { error } = validateTransaction(req.body);
+    if (error) {
+        error.details.map(function (err) {
+            valErrors.push({ field: err.context.key, message: err.message });
+        });
+    }
+    if (valErrors.length > 0) {
+        return res.status(400).json({ ok: false, errors: valErrors });
+    }
 
+    //validation existance of event and user
+    const event = await Event.findById(req.body.event);
+    if (!event) valErrors.push({ field: 'event', message: 'event_not_exists' });
 
-    Transaction.createRecord(req.body, function (err, result) {
+    //_id of user recovered from token
+    const user = await User.findById(req.decoded.user._id);
+    if (!user) valErrors.push({ field: 'user', message: 'user_not_exists' });
+
+    if (valErrors.length > 0) {
+        return res.status(400).json({ ok: false, errors: valErrors });
+    }
+
+    Transaction.createRecord(req, function (err, result) {
         if (err) return res.status(400).json(err);
         // transaction created
         Event.insertTransaction(req.body.event, result._id, function (errInsert, resultInsert) {
@@ -102,11 +107,20 @@ router.delete('/:transaction_id', function (req, res, next) {
         if (err) {
             return res.status(err.code).json({ ok: err.ok, message: err.message });
         }
-        //transaciont deleted
+        //transaction deleted
         return res.status(204).json({ ok: true, message: 'transaction_deleted' });
     });
 });
 
-
+function validateTransaction(transaction) {
+    const schema = {
+        event: Joi
+            .objectId()
+            .required(),
+        token: Joi
+            .string()
+    };
+    return Joi.validate(transaction, schema, { abortEarly: false });
+}
 
 module.exports = router;
