@@ -13,6 +13,7 @@ module.exports = function (app) {
     app.use('/apiv1/provinces', require('../routes/apiv1/provinces'));
     app.use('/apiv1/countries', require('../routes/apiv1/countries'));
     app.use('/apiv1/eventTypes', require('../routes/apiv1/eventTypes'));
+    app.use('/apiv1/favoriteSearches', require('../routes/apiv1/favoriteSearches'));
 
     // catch 404 and forward to error handler
     app.use(function (req, res, next) {

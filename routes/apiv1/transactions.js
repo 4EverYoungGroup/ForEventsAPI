@@ -103,6 +103,7 @@ router.get('/:transaction_id', function (req, res, next) {
 
 
 router.delete('/:transaction_id', function (req, res, next) {
+
     Transaction.deleteRecord(req, function (err) {
         if (err) {
             return res.status(err.code).json({ ok: err.ok, message: err.message });

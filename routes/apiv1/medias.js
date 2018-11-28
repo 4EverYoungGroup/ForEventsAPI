@@ -176,6 +176,7 @@ router.get('/:media_id', function (req, res, next) {
 
 
 router.delete('/:media_id', function (req, res, next) {
+
     Media.deleteRecord(req, function (err) {
         if (err) {
             return res.status(err.code).json({ ok: err.ok, message: err.message });
