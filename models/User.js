@@ -51,7 +51,7 @@ const userSchema = mongoose.Schema({
     phone_number: { type: String, index: true },
     create_date: { type: Date },
     delete_date: Date,
-    favorite_searches: [{ type: Schema.Types.ObjectId, ref: 'Favoritesearch' }],
+    favorite_searches: [{ type: Schema.Types.ObjectId, ref: 'Favorite_search' }],
     city: { type: Schema.Types.ObjectId, ref: 'City' },
     transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
     events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
@@ -259,9 +259,7 @@ userSchema.statics.getList = function (filters, limit, skip, sort, fields, inclu
     query.select(fields);
     query.populate({ path: 'city', match: { province: { $regex: new RegExp('mad', "ig") } } });
 
-    //query.populate({ path: 'city', match: { province: { $regex: new RegExp('mad', "ig") } } });
 
-    //console.log(filters);
     return query.exec(function (err, rows) {
         if (err) return cb(err);
 

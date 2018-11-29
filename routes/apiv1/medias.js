@@ -130,7 +130,7 @@ router.post('/', async (req, res, next) => {
         return res.status(400).json({ ok: false, errors: valErrors });
     }
 
-    Media.createRecord(req.body, function (err, result) {
+    Media.createRecord(req, function (err, result) {
 
         if (err) return res.status(400).json(err);
 

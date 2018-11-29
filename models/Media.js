@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const Event = require('./Event');
+const User = require('./User');
 
 const Joi = require('joi'); //validate data provided API
 const v = require('validator');
@@ -18,6 +19,7 @@ const mediaSchema = mongoose.Schema({
     description: { type: String, index: true },
     url: { type: String, index: true, required: true },
     event: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     media_type: { type: String, required: true, enum: Object.values(MediaTypes), index: true },
     poster: { type: Boolean, index: true, default: false }
 });
@@ -31,12 +33,12 @@ mediaSchema.statics.allowedTypes = function () {
     return ['picture', 'video'];
 };
 
-mediaSchema.statics.createRecord = function (newMedia, cb) {
+mediaSchema.statics.createRecord = function (req, cb) {
 
     // Validations
     const valErrors = [];
 
-    const { error } = validateMedia(newMedia);
+    const { error } = validateMedia(req.body);
     if (error) {
         error.details.map(function (err) {
             valErrors.push({ field: err.context.key, message: err.message });
@@ -45,7 +47,7 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
     }
 
     // verification url
-    if (v.isEmpty(newMedia.url) || !v.isURL(newMedia.url)) {
+    if (v.isEmpty(req.body.url) || !v.isURL(req.body.url)) {
         valErrors.push({ field: 'url', message: 'url_malformed' });
     }
 
@@ -53,23 +55,26 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
         return cb({ ok: false, errors: valErrors });
     }
 
-    if (newMedia.media_type === MediaTypes.video) {  //only media picture can set poster to true
-        newMedia.poster = false;
+    if (req.body.media_type === MediaTypes.video) {  //only media picture can set poster to true
+        req.body.poster = false;
     }
+
+
 
     //create new media
     const media = new Media({
-        name: newMedia.name,
-        description: newMedia.description || '',
-        url: newMedia.url,
-        media_type: MediaTypes[newMedia.media_type],
-        event: newMedia.event,
-        poster: newMedia.poster
+        name: req.body.name,
+        description: req.body.description || '',
+        url: req.body.url,
+        media_type: MediaTypes[req.body.media_type],
+        event: req.body.event,
+        user: req.decoded.user._id,
+        poster: req.body.poster
     })
 
     //we have to unset the media picture with poster to true , only one media picture with poster to true
-    if (newMedia.poster && newMedia.media_type === MediaTypes.picture) {
-        Media.findOneAndUpdate({ event: newMedia.event, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
+    if (req.body.poster && req.body.media_type === MediaTypes.picture) {
+        Media.findOneAndUpdate({ event: req.body.event, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
             if (err) {
                 return cb({ code: 500, ok: false, message: 'error_updating_previos_picture_poster' });
             }
@@ -77,7 +82,7 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
     }
 
     //if there is no medias registered for this event we force poster to true
-    Media.countDocuments({ event: newMedia.event }, (err, total) => {
+    Media.countDocuments({ event: req.body.event }, (err, total) => {
         if (err) return cb({ code: 500, ok: false, message: 'error_accesing_data' });
         if (total === 0) media.poster = true;
     });
@@ -92,10 +97,13 @@ mediaSchema.statics.createRecord = function (newMedia, cb) {
     })
 };
 
-
 mediaSchema.statics.getRecord = function (req, cb) {
 
+    //validation format
+    var valErrors = [];
 
+    if (!mongoose.Types.ObjectId.isValid(req.params.media_id))
+        return res.status(400).json({ ok: false, errors: 'media_id_format_is_not_correct' });
 
     Media.findOne({ _id: req.params.media_id }, function (err, mediaDB) {
         if (err) {
@@ -111,8 +119,6 @@ mediaSchema.statics.getRecord = function (req, cb) {
     })
 
 }
-
-
 
 // We create a static method to search for medias
 // The search can be paged and ordered
@@ -171,7 +177,7 @@ mediaSchema.statics.updateRecord = function (req, cb) {
         return cb({ code: 400, ok: false, message: valErrors });
     }
 
-    console.log(req.params.media_id)
+
     // Find media
     Media.findOne({ _id: req.params.media_id }, function (err, updatedMedia) {
 
@@ -184,7 +190,9 @@ mediaSchema.statics.updateRecord = function (req, cb) {
         }
         else {
 
-            //TODO: test if media you try to update is yours or your are an admin
+            if (updatedMedia.user != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
+                return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
+            }
 
             updatedMedia.name = req.body.name;
             updatedMedia.description = req.body.description;
@@ -223,6 +231,9 @@ mediaSchema.statics.deleteRecord = function (req, cb) {
             return cb({ code: 404, ok: false, message: 'media_not_exist' })
         }
         else {
+            if (DeletedMedia.user != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
+                return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
+            }
 
             if (DeletedMedia.poster) {
                 return cb({ code: 400, ok: false, message: 'delete_not_allowed_mark_another_media_poster_true_previously' })
