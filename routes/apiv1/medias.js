@@ -116,7 +116,7 @@ router.get('/list/:event_id', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
 
-    if (req.decoded.user.profile != 'Admin' || req.decoded.user.profile != 'Organizer') {
+    if (req.decoded.user.profile != 'Admin' && req.decoded.user.profile != 'Organizer') {
         return res.status(403).json({ ok: false, message: 'action_not_allowed_to_credentials_provided' })
     }
 
@@ -157,7 +157,7 @@ router.get('/mediatypes', function (req, res) {
 
 router.put('/:media_id', function (req, res, next) {
 
-    if (req.decoded.user.profile != 'Admin' || req.decoded.user.profile != 'Organizer') {
+    if (req.decoded.user.profile != 'Admin' && req.decoded.user.profile != 'Organizer') {
         return res.status(403).json({ ok: false, message: 'action_not_allowed_to_credentials_provided' })
     }
 

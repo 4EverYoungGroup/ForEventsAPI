@@ -16,9 +16,14 @@ const hash = require('hash.js');
 const config = require('config')
 
 //mailer
-const nodemailer = require('nodemailer')
+const mailer = require('../../lib/mailer');
+
+
 
 const constructSearchFilter = require('../../lib/utilitiesUsers');
+
+//constants
+const constants = require('../../constants/types');
 
 /**
  *
@@ -166,13 +171,8 @@ router.post('/login', function (req, res, next) {
  */
 
 router.post('/register', function (req, res, next) {
-
-
     User.createRecord(req.body, function (err, result) {
-
         if (err) return res.status(400).json(err);
-        //res.status(400).json(err);
-
         // user created
         return res.status(201).json({ ok: true, message: 'user_created', user: result });
     });
@@ -227,33 +227,19 @@ router.post('/recover', function (req, res, next) {
             return res.status(404).json({ ok: false, message: 'email_not_registered' });
         }
         else {
-            const transporter = nodemailer.createTransport({
-                host: config.get('mail.host'),
-                port: config.get('mail.port'),
-                secure: config.get('mail.secure'),
-                auth: {
-                    user: config.get('mail.user'),
-                    pass: config.get('mail.pass')
-                }
-            })
 
+            var idRequest = 1234
 
-            // setup e-mail data with unicode symbols
-            const mailOptions = {
-                from: '"4Events recover pass" <no-reply@4event.net>', // sender address
-                to: req.body.email, // list of receivers
-                subject: 'Recover pass 4Events', // Subject line
-                text: 'Recover password click this link ...', // plaintext body
-                html: '<b>Please click this <a href="">link</a> to recover password</b>' // html body
-            };
-
-            // send mail with defined transport object
-            transporter.sendMail(mailOptions, function (error, info) {
-                if (error) {
-                    return res.status(400).json({ ok: false, message: error.message })
-                }
-                return res.status(200).json({ ok: true, message: 'recover-message-sent' })
+            mailer.sendMail(req.body.email, idRequest, constants.TemplateTypes.recover, function (error, data) {
+                if (error) return res.status(500).json({ ok: false, messager: 'error_sending_email' })
+                if (data) return res.status(200).json({ ok: data.ok, message: data.message })
             });
+
+            // mailer.sendMessage(req.body.email, constants.EmailTypes.recover, function (error, data) {
+            //     if (error) return res.status(500).json({ ok: false, messager: 'error_sending_email' })
+            //     if (data) return res.status(200).json({ ok: data.ok, message: data.message })
+            // });
+
         }
     })
 });

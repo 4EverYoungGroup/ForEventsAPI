@@ -1,8 +1,6 @@
-const express = require('express');
-const path = require('path');
+// const express = require('express');
+// const path = require('path');
 module.exports = function (app) {
-
-    app.use(express.static(path.join(__dirname, 'public')));
 
     app.use('/', require('../routes/index'));
     app.use('/apiv1/users', require('../routes/apiv1/users'));

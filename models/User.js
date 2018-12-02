@@ -70,9 +70,6 @@ userSchema.statics.createRecord = function (newUser, cb) {
 
     //Validation with joi
     const valErrors = [];
-
-
-
     const { error } = validateUser(newUser);
     if (error) {
         error.details.map(function (err) {
@@ -97,7 +94,6 @@ userSchema.statics.createRecord = function (newUser, cb) {
         if (err) {
             return cb(err);
         }
-
         // user already exists
         if (user) {
             return cb({ ok: false, message: 'user_email_duplicated' });
@@ -277,7 +273,6 @@ userSchema.statics.getList = function (filters, limit, skip, sort, fields, inclu
         });
     });
 }
-
 
 //Methods JOSEP
 
