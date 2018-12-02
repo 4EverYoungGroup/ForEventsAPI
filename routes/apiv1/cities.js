@@ -22,8 +22,10 @@ router.get('/', async (req, res, next) => {
         const limit = parseInt(req.query.limit) || 25;
         const nearMe = req.query.nearMe;
         const fields = req.query.fields;
+        const sort = req.query.sort;
+        const id = req.query.id;
 
-        var list = await City.listCity(queryText,city,province,country,zip_code,limit, nearMe, fields);
+        var list = await City.listCity(id,queryText,city,province,country,zip_code,limit, nearMe, fields, sort);
         if(list.code){res.json({ok: false, result: list});};
         res.status(200).json({ok: true, result: list});
     } catch (err){
