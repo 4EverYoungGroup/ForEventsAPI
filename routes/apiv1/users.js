@@ -231,15 +231,10 @@ router.post('/recover', function (req, res, next) {
             var idRequest = 1234
 
             mailer.sendMail(req.body.email, idRequest, constants.TemplateTypes.recover, function (error, data) {
+                console.log(data);
                 if (error) return res.status(500).json({ ok: false, messager: 'error_sending_email' })
                 if (data) return res.status(200).json({ ok: data.ok, message: data.message })
             });
-
-            // mailer.sendMessage(req.body.email, constants.EmailTypes.recover, function (error, data) {
-            //     if (error) return res.status(500).json({ ok: false, messager: 'error_sending_email' })
-            //     if (data) return res.status(200).json({ ok: data.ok, message: data.message })
-            // });
-
         }
     })
 });
