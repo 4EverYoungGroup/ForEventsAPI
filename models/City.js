@@ -23,7 +23,7 @@ citySchema.index({ "location": "2dsphere" });
 
 
 //List Cities containt partial word in a city, province or country
-citySchema.statics.listCity = function(queryText,city,province,country,zip_code,limit,location, fields){
+citySchema.statics.listCity = function(id,queryText,city,province,country,zip_code,limit,location, fields, sort){
     let filter = {};
     let filterLocation = {};
     let filterReturn = {};
@@ -59,6 +59,10 @@ citySchema.statics.listCity = function(queryText,city,province,country,zip_code,
     if (country.length < 3) return  {code: 400, ok: false, message: 'error in the search. 3 characters are required minimum'};
         filter.country = { $regex: new RegExp(country, "ig") };
     };
+    if (id){
+        if (id.length !== 24) return  {code: 400, ok: false, message: 'error in the search. 3 characters are required minimum'};
+            filter._id = id;
+       };
 
     if (location){
         let locationS = location.split(',')
@@ -89,8 +93,12 @@ citySchema.statics.listCity = function(queryText,city,province,country,zip_code,
     const query = City.find(filterReturn);
     query.limit (limit);
     if (fields){
-        query.select(fields)
+        query.select(fields);
     };
+    if (sort){
+        query.sort(sort);
+    }
+
     return query.exec();
 };
 
