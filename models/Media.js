@@ -198,16 +198,11 @@ mediaSchema.statics.updateRecord = function (req, cb) {
             } else {
                 updatedMedia.poster = false;
             }
-            // console.log((typeof req.body.poster !== 'undefined'))
-            // console.log(req.body.media_type === MediaTypes.picture)
-            // console.log(req.body.poster === 'true')
             if ((typeof req.body.poster !== 'undefined') && req.body.media_type === MediaTypes.picture && req.body.poster === 'true') {
-                // console.log('entro')
                 Media.findOneAndUpdate({ event: updatedMedia.event, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
                     if (err) {
                         return cb({ code: 500, ok: false, message: 'error_updating_previous_picture_poster' });
                     }
-                    // console.log('doc: ' + doc)
                 });
             }
 

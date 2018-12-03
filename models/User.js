@@ -184,25 +184,25 @@ userSchema.statics.updateRecord = function (req, cb) {
             return cb({ code: 404, ok: false, message: 'user_not_exist' });
         }
         else {
-            updatedUser.email = req.body.email;
-            updatedUser.first_name = req.body.first_name;
-            updatedUser.last_name = req.body.last_name;
+            updatedUser.email = (typeof req.body.email !== 'undefined') ? req.body.email : updatedUser.email;
+            updatedUser.first_name = (typeof req.body.first_name !== 'undefined') ? req.body.first_name : updatedUser.first_name;
+            updatedUser.last_name = (typeof req.body.last_name !== 'undefined') ? req.body.last_name : updatedUser.last_name;
             // Calculate hash of paswword to save in database
-            if (req.body.password) {
+            if ((typeof req.body.password !== 'undefined')) {
                 let hashedPassword = hash.sha256().update(req.body.password).digest('hex');
                 updatedUser.password = hashedPassword;
             }
-            updatedUser.alias = req.body.alias;
-            updatedUser.birthday_date = req.body.birthday_date;
-            updatedUser.gender = req.body.gender;
-            updatedUser.address = req.body.address;
-            updatedUser.zip_code = req.body.zip_code;
-            updatedUser.province = req.body.province;
-            updatedUser.country = req.body.country;
-            updatedUser.idn = req.body.idn;
-            updatedUser.company_name = req.body.company_name;
-            updatedUser.mobile_number = req.body.mobile_number;
-            updatedUser.phone_number = req.body.phone_number;
+            updatedUser.alias = (typeof req.body.alias !== 'undefined') ? req.body.alias : updatedUser.alias;
+            updatedUser.birthday_date = (typeof req.body.birthday_date !== 'undefined') ? req.body.birthday_date : updatedUser.birthday_date;
+            updatedUser.gender = (typeof req.body.gender !== 'undefined') ? req.body.gender : updatedUser.gender;
+            updatedUser.address = (typeof req.body.address !== 'undefined') ? req.body.address : updatedUser.address;
+            updatedUser.zip_code = (typeof req.body.zip_code !== 'undefined') ? req.body.zip_code : updatedUser.zip_code;
+            updatedUser.province = (typeof req.body.province !== 'undefined') ? req.body.province : updatedUser.province;
+            updatedUser.country = (typeof req.body.country !== 'undefined') ? req.body.country : updatedUser.country;
+            updatedUser.idn = (typeof req.body.idn !== 'undefined') ? req.body.idn : updatedUser.idn;
+            updatedUser.company_name = (typeof req.body.company_name !== 'undefined') ? req.body.company_name : updatedUser.company_name;
+            updatedUser.mobile_number = (typeof req.body.mobile_number !== 'undefined') ? req.body.mobile_number : updatedUser.mobile_number;
+            updatedUser.phone_number = (typeof req.body.phone_number !== 'undefined') ? req.body.phone_number : updatedUser.phone_number;
 
             //update user
             updatedUser.save();
