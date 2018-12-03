@@ -15,11 +15,11 @@ const MediaTypes = Object.freeze({
 var Schema = mongoose.Schema;
 
 const mediaSchema = mongoose.Schema({
-    name: { type: String, index: true, required: true },
+    name: { type: String, index: true },
     description: { type: String, index: true },
     url: { type: String, index: true, required: true },
-    event: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    event: { type: Schema.Types.ObjectId, ref: 'Event' },
+    user: { type: Schema.Types.ObjectId, ref: 'User' },
     media_type: { type: String, required: true, enum: Object.values(MediaTypes), index: true },
     poster: { type: Boolean, index: true, default: false }
 });
@@ -152,11 +152,6 @@ mediaSchema.statics.getList = function (filters, limit, skip, sort, fields, incl
 
 mediaSchema.statics.updateRecord = function (req, cb) {
 
-    // if (req.params.user_id != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
-    //     return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
-
-    // }
-
     //Validation with joi
     const valErrors = [];
 
@@ -194,21 +189,25 @@ mediaSchema.statics.updateRecord = function (req, cb) {
                 return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
             }
 
-            updatedMedia.name = req.body.name;
-            updatedMedia.description = req.body.description;
-            updatedMedia.url = req.body.url;
-            updatedMedia.media_type = req.body.media_type;
+            updatedMedia.name = (typeof req.body.name !== 'undefined') ? req.body.name : updatedMedia.name;
+            updatedMedia.description = (typeof req.body.description !== 'undefined') ? req.body.description : updatedMedia.description;
+            updatedMedia.url = (typeof req.body.url !== 'undefined') ? req.body.url : updatedMedia.url;
+            updatedMedia.media_type = (typeof req.body.media_type !== 'undefined') ? req.body.media_type : updatedMedia.media_type;
             if (req.body.media_type === MediaTypes.picture) {
                 updatedMedia.poster = req.body.poster;
             } else {
                 updatedMedia.poster = false;
             }
-
-            if (req.body.poster && req.body.media_type === MediaTypes.picture) {
+            // console.log((typeof req.body.poster !== 'undefined'))
+            // console.log(req.body.media_type === MediaTypes.picture)
+            // console.log(req.body.poster === 'true')
+            if ((typeof req.body.poster !== 'undefined') && req.body.media_type === MediaTypes.picture && req.body.poster === 'true') {
+                // console.log('entro')
                 Media.findOneAndUpdate({ event: updatedMedia.event, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
                     if (err) {
-                        return cb({ code: 500, ok: false, message: 'error_updating_previos_picture_poster' });
+                        return cb({ code: 500, ok: false, message: 'error_updating_previous_picture_poster' });
                     }
+                    // console.log('doc: ' + doc)
                 });
             }
 
@@ -279,8 +278,7 @@ function validateUpdatedMedia(media) {
         name: Joi
             .string()
             .min(5)
-            .max(150)
-            .required(),
+            .max(150),
         description: Joi
             .string()
             .max(255)

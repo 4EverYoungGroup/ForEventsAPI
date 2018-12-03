@@ -237,7 +237,7 @@ userSchema.statics.getRecord = function (req, cb) {
                 return cb(null, userDB)
             }
         }
-    })
+    }).populate('city');
 
 }
 
