@@ -22,8 +22,7 @@ passwordSchema
 
 const GenderTypes = Object.freeze({
     M: 'Male',
-    F: 'Female',
-    O: 'Other'
+    F: 'Female'
 });
 
 const ProfileTypes = Object.freeze({
