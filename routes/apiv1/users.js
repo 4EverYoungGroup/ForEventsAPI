@@ -97,7 +97,7 @@ router.post('/login', function (req, res, next) {
                 return res.json({ ok: true, token: token, user: user });
             }
         }
-    });
+    }).populate('city');
 
 });
 
