@@ -42,8 +42,9 @@ eventSchema.index({ "location": "2dsphere" });
 
 // We create a static method to search for events
 // The search can be paged
-eventSchema.statics.list = function(filters,limit, skip, sort, fields, organizer, media, users, event_type, transactions){
+eventSchema.statics.list = function(idUser,filters,limit, skip, sort, fields, organizer, media, users, event_type, transactions){
     const query = Event.find(filters);
+    
     query.limit (limit);
     query.skip(skip);
     query.sort(sort);
@@ -54,13 +55,23 @@ eventSchema.statics.list = function(filters,limit, skip, sort, fields, organizer
     if (media){
         query.populate('media', media);
     };
-    if (users){
+
+    if (idUser && users){
+        query.populate({ path: 'users', select: users, match: { _id: idUser }});
+    } else if(idUser){
+        query.populate({ path: 'users', match: { _id: idUser }});
+    } else if(users){
         query.populate('users', users);
-    };
+    }
+    
     if (event_type){
         query.populate('event_type', event_type);
     }
-    if (transactions){
+    if (idUser && transactions){
+        query.populate({ path: 'transactions', select: users, match: { user: idUser }});
+    }else if(idUser){
+        query.populate({ path: 'transactions', match: { user: idUser }});
+    }else if(transactions){
         query.populate('transactions', transactions);
     };
     return query.exec();
