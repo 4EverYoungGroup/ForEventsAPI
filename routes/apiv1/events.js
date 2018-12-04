@@ -38,9 +38,8 @@ router.get('/', async (req, res, next) => {
         const filter = mainSearch(req);
         const favorite = req.query.favorite;
         const userId = req.query.userId;
-        if (favorite && userId){
-            // TODO save the query filter
-        };
+        
+        
         const event_typeName = req.query.event_typeName;
         if (event_typeName){
             
@@ -52,7 +51,7 @@ router.get('/', async (req, res, next) => {
             };
             
         };
-        const list = await Event.list(filter,limit, skip, sort, fields, organizer, media, users, event_type, transactions);
+        const list = await Event.list(userId,filter,limit, skip, sort, fields, organizer, media, users, event_type, transactions);
         const rowsCount = await Event.countTot(filter)
        
         if (req.query.includeTotal === 'true'){
