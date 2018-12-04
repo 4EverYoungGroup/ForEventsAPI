@@ -68,7 +68,7 @@ eventSchema.statics.list = function(idUser,filters,limit, skip, sort, fields, or
         query.populate('event_type', event_type);
     }
     if (idUser && transactions){
-        query.populate({ path: 'transactions', select: users, match: { user: idUser }});
+        query.populate({ path: 'transactions', select: transactions, match: { user: idUser }});
     }else if(idUser){
         query.populate({ path: 'transactions', match: { user: idUser }});
     }else if(transactions){
