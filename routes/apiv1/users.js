@@ -383,8 +383,8 @@ router.put('/:user_id', function (req, res, next) {
 
     User.updateRecord(req, function (err, result) {
         if (err) {
-            return res.json(err);
-            //return res.status(err.code).json({ ok: err.ok, message: err.message });
+            //return res.statisjson(err);
+            return res.status(err.code).json({ ok: err.ok, message: err.message });
         }
         //user updated
         return res.status(200).json({ ok: true, message: 'user_updated', user: result });

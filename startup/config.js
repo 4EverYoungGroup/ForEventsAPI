@@ -18,4 +18,7 @@ module.exports = function () {
     if (!config.get('db.pass')) {
         throw new Error('FATAL ERROR: db.pass is not defined.');
     }
+    if (!config.get('fb.key')) {
+        throw new Error('FATAL ERROR: fb.key is not defined.');
+    }
 }

@@ -9,5 +9,8 @@
     "db": {
         "user": "ForEvents_dbUser",
         "pass": "ForEvents_dbPass"
+    },
+    "fb": {
+        "key": "ForEvents_FBKey"
     }
 }

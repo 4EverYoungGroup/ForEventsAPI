@@ -54,6 +54,8 @@ const userSchema = mongoose.Schema({
     city: { type: Schema.Types.ObjectId, ref: 'City' },
     transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
     events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
+    validatedEmail: { type: Boolean, default: false },
+    tokensFB: [{ type: String }]
 });
 
 
@@ -203,6 +205,11 @@ userSchema.statics.updateRecord = function (req, cb) {
             updatedUser.company_name = (typeof req.body.company_name !== 'undefined') ? req.body.company_name : updatedUser.company_name;
             updatedUser.mobile_number = (typeof req.body.mobile_number !== 'undefined') ? req.body.mobile_number : updatedUser.mobile_number;
             updatedUser.phone_number = (typeof req.body.phone_number !== 'undefined') ? req.body.phone_number : updatedUser.phone_number;
+            updatedUser.validatedEmail = (typeof req.body.validatedEmail !== 'undefined' && req.body.validatedEmail === 'true') ? req.body.validatedEmail : updatedUser.validatedEmail;
+
+            if ((typeof req.body.tokenFB !== 'undefined') && (updatedUser.tokensFB.indexOf(req.body.tokenFB) === -1)) {
+                updatedUser.tokensFB.push(req.body.tokenFB)
+            }
 
             //update user
             updatedUser.save();
@@ -370,7 +377,13 @@ function validateUser(user) {
         phone_number: Joi
             .string()
             .allow('')
-            .regex(/^[0-9]{11}$/)
+            .regex(/^[0-9]{11}$/),
+        validatedEmail: Joi
+            .boolean().truthy('true').falsy('false').insensitive(true),
+        tokenFB: Joi
+            .string()
+            .max(255)
+            .allow(''),
     };
     return Joi.validate(user, schema, { abortEarly: false });
 }
@@ -444,7 +457,13 @@ function validateUpdatedUser(user) {
             .regex(/^[0-9]{11}$/)
             .allow(''),
         token: Joi
+            .string(),
+        validatedEmail: Joi
+            .boolean().truthy('true').falsy('false').insensitive(true),
+        tokenFB: Joi
             .string()
+            .max(255)
+            .allow(''),
     };
     return Joi.validate(user, schema, { abortEarly: false });
 }
