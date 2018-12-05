@@ -61,18 +61,9 @@ favorite_searchSchema.statics.deleteFavorite_Search = function(_id){
     Favorite_search.remove({_id: _id }).exec();
 }
 
-/*favorite_searchSchema.statics.allSearch = async function(_id){
-    
-    await Favorite_search.find().cursor().eachAsync(async function(favorite){
-        var filter = JSON.parse(favorite.query) ;
-        filter._id = _id;
-        await Event.list(filter, , , ,'')
-    });
-
-}*/
 
 //Create model
-const Favorite_search = mongoose.model('Favoritesearch', favorite_searchSchema);
+const Favorite_search = mongoose.model('Favorite_search', favorite_searchSchema);
 
 //and export model
 module.exports = Favorite_search;
