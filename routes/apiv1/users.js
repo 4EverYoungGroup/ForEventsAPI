@@ -174,7 +174,19 @@ router.post('/register', function (req, res, next) {
     User.createRecord(req.body, function (err, result) {
         if (err) return res.status(400).json(err);
         // user created
-        return res.status(201).json({ ok: true, message: 'user_created', user: result });
+        if (result) {
+            //TODO: specify id of the recover pass
+            var idRequest = 1234
+
+            mailer.sendMail(req.body.email, idRequest, result, constants.TemplateTypes.register,
+                function (error, data) {
+                    if (error) return res.status(500).json({ ok: false, message: 'error_sending_email_register' })
+                    return res.status(201).json({ ok: true, message: 'user_created_email_email_sent', user: result });
+                    //else return res.status(200).json({ ok: data.ok, message: data.message })
+                });
+            //return res.status(201).json({ ok: true, message: 'user_created_email', user: result });
+        }
+
     });
 });
 
@@ -229,8 +241,8 @@ router.post('/recover', function (req, res, next) {
         else {
             //TODO: specify id of the recover pass
             var idRequest = 1234
-
-            mailer.sendMail(req.body.email, idRequest, constants.TemplateTypes.recover,
+            var data = {}
+            mailer.sendMail(req.body.email, idRequest, data, constants.TemplateTypes.recover,
                 function (error, data) {
                     if (error) return res.status(500).json({ ok: false, message: 'error_sending_email' })
                     else return res.status(200).json({ ok: data.ok, message: data.message })

@@ -5,12 +5,14 @@ const hash = require('hash.js');  //import to calculate hash of password
 const pv = require('password-validator'); //control password restrictions
 const Joi = require('joi'); //validate data provided API
 
+//Collections
 const Favorite_search = require('./Favorite_search');
 const City = require('./City');
 const Transaction = require('./Transaction');
 const Event = require('./Event')
 
-var Schema = mongoose.Schema;
+//constants
+const constants = require('../constants/types');
 
 const passwordSchema = new pv();
 passwordSchema
@@ -20,26 +22,28 @@ passwordSchema
     .has().lowercase()
     .has().digits();
 
-const GenderTypes = Object.freeze({
-    M: 'Male',
-    F: 'Female'
-});
+// const GenderTypes = Object.freeze({
+//     M: 'Male',
+//     F: 'Female'
+// });
 
-const ProfileTypes = Object.freeze({
-    Admin: 'Admin',
-    User: 'User',
-    Organizer: 'Organizer'
-});
+// const ProfileTypes = Object.freeze({
+//     Admin: 'Admin',
+//     User: 'User',
+//     Organizer: 'Organizer'
+// });
 
+// Schema definition
+var Schema = mongoose.Schema;
 const userSchema = mongoose.Schema({
     first_name: { type: String, index: true },
     last_name: { type: String, index: true },
     email: { type: String, index: true },
     password: { type: String },
-    profile: { type: String, enum: Object.values(ProfileTypes), default: 'User' },
+    profile: { type: String, enum: Object.values(constants.ProfileTypes), default: 'User' },
     alias: { type: String, index: true },
     birthday_date: Date,
-    gender: { type: String, enum: Object.keys(GenderTypes) },
+    gender: { type: String, enum: Object.keys(constants.GenderTypes) },
     address: { type: String, index: true },
     zip_code: { type: String, index: true },
     province: { type: String, index: true },
@@ -305,6 +309,8 @@ userSchema.statics.deleteFavorite_search = function (userId, favoriteId, cb) {
     });
 };
 
+// ******
+
 function validateUser(user) {
     const schema = {
         first_name: Joi
@@ -329,7 +335,7 @@ function validateUser(user) {
             .required(),
         profile: Joi
             .string()
-            .valid(Object.keys(ProfileTypes))
+            .valid(Object.keys(constants.ProfileTypes))
             .allow(''),
         address: Joi
             .string()
@@ -355,7 +361,7 @@ function validateUser(user) {
         gender: Joi
             .string()
             .allow('')
-            .valid(Object.keys(GenderTypes)),
+            .valid(Object.keys(constants.GenderTypes)),
         alias: Joi
             .string()
             .alphanum()
@@ -409,7 +415,7 @@ function validateUpdatedUser(user) {
             .regex(/^[a-zA-Z0-9]{6,50}$/),
         profile: Joi
             .string()
-            .valid(Object.keys(ProfileTypes)),
+            .valid(Object.keys(constants.ProfileTypes)),
         address: Joi
             .string()
             .max(255)
@@ -433,7 +439,7 @@ function validateUpdatedUser(user) {
         gender: Joi
             .string()
             .allow('')
-            .valid(Object.keys(GenderTypes)),
+            .valid(Object.keys(constants.GenderTypes)),
         alias: Joi
             .string()
             .alphanum()
