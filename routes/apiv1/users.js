@@ -18,12 +18,53 @@ const config = require('config')
 //mailer
 const mailer = require('../../lib/mailer');
 
+//FB notifications
+const fbNotification = require('../../lib/notificationsFB.js')
 
-
+//utilities
 const constructSearchFilter = require('../../lib/utilitiesUsers');
 
 //constants
 const constants = require('../../constants/types');
+
+
+router.post('/notificate', function (req, res, next) {
+
+    const event_id = '5bfef45a4dd10ae820fdeaa7'
+    const currentDate = new Date();
+
+    var message = {
+        collapseKey: '4events',
+        priority: 'high',
+        contentAvailable: true,
+        delayWhileIdle: true,
+        timeToLive: 3,
+        // dryRun: true,
+        data: {
+            event_id: event_id,
+        },
+        notification: {
+            title: "4Events: Nuevo evento registrado",
+            icon: "ic_launcher",
+            body: "Hemos encontrado un nuevo evento que puede ser de tu agrado. " + currentDate.getDate()
+        }
+    };
+
+    //TODO: eliminar estas lineas
+    //armando
+    //const token_fbArmando = 'eLM7ZeTEkwA:APA91bETqgO6VJLVGlOHm1g03oWOcQfYSzFxu5huYW46q8eoV4wH8NSZpCRNPLSJO-wkKrcL968Jpu2uoqw0EIPITtSzpHgwYBvwWtPfQnb6-YlGCQ5k4woyoVCvNddyXUMOWI_IIOFA';
+    const token_fbArmando = 'eLM7ZeTEkwA:APA91bETqgO6VJLVGlOHm1g03oWOcQfYSzFxu5huYW46q8eoV4wH8NSZpCRNPLSJO-wkKrcL968Jpu2uoqw0EIPITtSzpHgwYBvwWtPfQnb6-YlGCQ5k4woyoVCvNddyXUMOWI_IIOFA';
+
+    //luis
+    const token_fbLuis = 'dRr4_uFzv4o:APA91bHNCPA0X83hlvBUAJTpG5zR3pl_K9uJ4Qa05u-LJyicTFaSiCvYfeJG4gTIhGlHf61Y8NM4JXH_YjXeXa3fBWU6I2GFTTcD_c0a7-hL65_QeUCydTLlLgYYdku5VXe5cm0XHoj7';
+
+    const tokens_fb = [token_fbLuis, token_fbArmando];
+
+    fbNotification.sendNotification(message, tokens_fb, function (error, data) {
+        if (error) res.status(error.message).json({ ok: false, message: 'error_sending_notification' })
+        if (data) res.status(200).json({ ok: true, message: data });
+    })
+});
 
 /**
  *
@@ -250,6 +291,9 @@ router.post('/recover', function (req, res, next) {
         }
     })
 });
+
+
+
 
 //Auth with JWT - ***************
 
