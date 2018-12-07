@@ -12,15 +12,15 @@ const favorite_searchSchema = Schema({
     _id: Schema.Types.ObjectId,
     create_date: {type: Date, default: Date.now, index: true},
     query: {type: String, index: true},
-    name: {type: String, index: true},
+    name_search: {type: String, index: true},
     event_type: [{type: Schema.Types.ObjectId, ref: 'Event_type'}],
     user: {type: Schema.Types.ObjectId, ref: 'User'}
 });
 
 
 //Insert New Favorite_Srearch
-favorite_searchSchema.statics.insertFavorite_search =  function(userId,favorite_search,name, cb){
-    if (!userId || !favorite_search || !name){
+favorite_searchSchema.statics.insertFavorite_search =  function(userId,favorite_search,name_search, cb){
+    if (!userId || !favorite_search || !name_search){
         return cb({ code: 400, ok: false, message: 'error saving Favorite_search User Id, name are required' + err});  
 
     }else{
@@ -28,7 +28,7 @@ favorite_searchSchema.statics.insertFavorite_search =  function(userId,favorite_
             _id: new mongoose.Types.ObjectId(),
             user: userId,
             query: favorite_search,
-            name: name
+            name_search: name_search
         });
 
         favoriteS.save((err, favoriteSearchSave) => {
