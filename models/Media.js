@@ -6,6 +6,7 @@ const User = require('./User');
 
 const Joi = require('joi'); //validate data provided API
 const v = require('validator');
+const validation = require('../startup/validation');
 
 const MediaTypes = Object.freeze({
     picture: 'picture',
@@ -38,7 +39,7 @@ mediaSchema.statics.createRecord = function (req, cb) {
     // Validations
     const valErrors = [];
 
-    const { error } = validateMedia(req.body);
+    const { error } = validation.validateMedia(req.body);
     if (error) {
         error.details.map(function (err) {
             valErrors.push({ field: err.context.key, message: err.message });
@@ -155,12 +156,11 @@ mediaSchema.statics.updateRecord = function (req, cb) {
     //Validation with joi
     const valErrors = [];
 
-    //console.log(Object.keys(req.body).length)
     if (((typeof req.body.token != 'undefined') && Object.keys(req.body).length == 1) || Object.keys(req.body).length < 1) {
         valErrors.push({ field: 'none', message: 'nothing_to_update' });
     }
 
-    const { error } = validateUpdatedMedia(req.body);
+    const { error } = validation.validateUpdatedMedia(req.body);
     if (error) {
         error.details.map(function (err) {
             valErrors.push({ field: err.context.key, message: err.message });
@@ -215,7 +215,6 @@ mediaSchema.statics.updateRecord = function (req, cb) {
 };
 
 mediaSchema.statics.deleteRecord = function (req, cb) {
-
     Media.findOne({ _id: req.params.media_id }, function (err, DeletedMedia) {
         if (err) {
             return cb({ code: 500, ok: false, message: 'error_accesing_data' });
@@ -236,62 +235,6 @@ mediaSchema.statics.deleteRecord = function (req, cb) {
         }
     })
 
-}
-
-function validateMedia(media) {
-    const schema = {
-        name: Joi
-            .string()
-            .min(5)
-            .max(150)
-            .required(),
-        description: Joi
-            .string()
-            .max(255)
-            .allow(''),
-        url: Joi
-            .string()
-            .required()
-            .uri(),
-        media_type: Joi
-            .string()
-            .valid(Object.keys(MediaTypes))
-            .required(),
-        event: Joi
-            .objectId()
-            .required(),
-        poster: Joi
-            .boolean(),
-        token: Joi
-            .string()
-    };
-    return Joi.validate(media, schema, { abortEarly: false });
-}
-
-function validateUpdatedMedia(media) {
-    const schema = {
-        name: Joi
-            .string()
-            .min(5)
-            .max(150),
-        description: Joi
-            .string()
-            .max(255)
-            .allow(''),
-        url: Joi
-            .string()
-            .required()
-            .uri(),
-        media_type: Joi
-            .string()
-            .valid(Object.keys(MediaTypes))
-            .required(),
-        poster: Joi
-            .boolean(),
-        token: Joi
-            .string()
-    };
-    return Joi.validate(media, schema, { abortEarly: false });
 }
 
 var Media = mongoose.model('Media', mediaSchema);

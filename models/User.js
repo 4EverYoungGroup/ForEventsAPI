@@ -2,8 +2,11 @@
 
 const mongoose = require('mongoose');
 const hash = require('hash.js');  //import to calculate hash of password
+
+//validations
 const pv = require('password-validator'); //control password restrictions
 const Joi = require('joi'); //validate data provided API
+const validation = require('../startup/validation');
 
 //Collections
 const Favorite_search = require('./Favorite_search');
@@ -22,16 +25,6 @@ passwordSchema
     .has().lowercase()
     .has().digits();
 
-// const GenderTypes = Object.freeze({
-//     M: 'Male',
-//     F: 'Female'
-// });
-
-// const ProfileTypes = Object.freeze({
-//     Admin: 'Admin',
-//     User: 'User',
-//     Organizer: 'Organizer'
-// });
 
 // Schema definition
 var Schema = mongoose.Schema;
@@ -75,12 +68,11 @@ userSchema.statics.createRecord = function (newUser, cb) {
 
     //Validation with joi
     const valErrors = [];
-    const { error } = validateUser(newUser);
+    const { error } = validation.validateUser(newUser);
     if (error) {
         error.details.map(function (err) {
             valErrors.push({ field: err.context.key, message: err.message });
         });
-
     }
     //control restrictions password, must include 1 letter uppercase, 1 letter lowercase and 1 digit 
     if ((typeof newUser.password != 'undefined') && !passwordSchema.validate(newUser.password)) {
@@ -120,8 +112,7 @@ userSchema.statics.createRecord = function (newUser, cb) {
 };
 
 userSchema.statics.deleteRecord = function (req, cb) {
-    //console.log('req.params._id: ' + req.params.user_id + ' req.decoded._id: ' + req.decoded.user._id);
-    //console.log(req.decoded.user.email);
+
     if (req.params.user_id != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
         return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
 
@@ -162,7 +153,7 @@ userSchema.statics.updateRecord = function (req, cb) {
         valErrors.push({ field: 'none', message: 'nothing_to_update' });
     }
 
-    const { error } = validateUpdatedUser(req.body);
+    const { error } = validation.validateUpdatedUser(req.body);
     if (error) {
         error.details.map(function (err) {
             valErrors.push({ field: err.context.key, message: err.message });
@@ -310,169 +301,6 @@ userSchema.statics.deleteFavorite_search = function (userId, favoriteId, cb) {
 };
 
 // ******
-
-function validateUser(user) {
-    const schema = {
-        first_name: Joi
-            .string()
-            .min(2)
-            .max(50)
-            .required(),
-        last_name: Joi
-            .string()
-            .min(2)
-            .max(255)
-            .allow(''),
-        email: Joi
-            .string()
-            .min(6)
-            .max(255)
-            .required()
-            .email({ minDomainAtoms: 2 }),
-        password: Joi
-            .string()
-            .regex(/^[a-zA-Z0-9]{6,50}$/)
-            .required(),
-        profile: Joi
-            .string()
-            .valid(Object.keys(constants.ProfileTypes))
-            .allow(''),
-        address: Joi
-            .string()
-            .max(255)
-            .allow(''),
-        city: Joi
-            .objectId(),
-        zip_code: Joi
-            .string()
-            .max(20)
-            .allow(''),
-        province: Joi
-            .string()
-            .max(255)
-            .allow(''),
-        country: Joi
-            .string()
-            .max(255)
-            .allow(''),
-        birthday_date: Joi
-            .date()
-            .allow(''),
-        gender: Joi
-            .string()
-            .allow('')
-            .valid(Object.keys(constants.GenderTypes)),
-        alias: Joi
-            .string()
-            .alphanum()
-            .max(255)
-            .allow(''),
-        idn: Joi
-            .string()
-            .alphanum()
-            .allow('')
-            .max(50),
-        company_name: Joi
-            .string()
-            .allow('')
-            .max(255),
-        mobile_number: Joi
-            .string()
-            .allow('')
-            .regex(/^[0-9]{11}$/),
-        phone_number: Joi
-            .string()
-            .allow('')
-            .regex(/^[0-9]{11}$/),
-        validatedEmail: Joi
-            .boolean().truthy('true').falsy('false').insensitive(true),
-        tokenFB: Joi
-            .string()
-            .max(255)
-            .allow(''),
-    };
-    return Joi.validate(user, schema, { abortEarly: false });
-}
-
-function validateUpdatedUser(user) {
-    const schema = {
-        first_name: Joi
-            .string()
-            .min(2)
-            .max(50),
-        last_name: Joi
-            .string()
-            .min(2)
-            .max(255)
-            .allow(''),
-        email: Joi
-            .string()
-            .min(6)
-            .max(255)
-            .email({ minDomainAtoms: 2 }),
-        password: Joi
-            .string()
-            .regex(/^[a-zA-Z0-9]{6,50}$/),
-        profile: Joi
-            .string()
-            .valid(Object.keys(constants.ProfileTypes)),
-        address: Joi
-            .string()
-            .max(255)
-            .allow(''),
-        city: Joi
-            .objectId(),
-        zip_code: Joi
-            .string()
-            .max(20)
-            .allow(''),
-        province: Joi
-            .string()
-            .max(255)
-            .allow(''),
-        country: Joi
-            .string()
-            .allow('')
-            .max(255),
-        birthday_date: Joi
-            .date(),
-        gender: Joi
-            .string()
-            .allow('')
-            .valid(Object.keys(constants.GenderTypes)),
-        alias: Joi
-            .string()
-            .alphanum()
-            .allow('')
-            .max(255),
-        idn: Joi
-            .string()
-            .alphanum()
-            .allow('')
-            .max(50),
-        company_name: Joi
-            .string()
-            .allow('')
-            .max(255),
-        mobile_number: Joi
-            .string()
-            .regex(/^[0-9]{11}$/)
-            .allow(''),
-        phone_number: Joi
-            .string()
-            .regex(/^[0-9]{11}$/)
-            .allow(''),
-        token: Joi
-            .string(),
-        validatedEmail: Joi
-            .boolean().truthy('true').falsy('false').insensitive(true),
-        tokenFB: Joi
-            .string()
-            .max(255)
-            .allow(''),
-    };
-    return Joi.validate(user, schema, { abortEarly: false });
-}
 
 var User = mongoose.model('User', userSchema);
 

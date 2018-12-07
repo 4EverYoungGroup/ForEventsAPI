@@ -10,7 +10,9 @@ const Event = mongoose.model('Event');
 const User = mongoose.model('User');
 
 
-const Joi = require('joi'); //validate data provided API
+//const Joi = require('joi'); //validate data provided API
+
+const validation = require('../../startup/validation');
 
 //security
 const jwt = require('jsonwebtoken');
@@ -42,6 +44,7 @@ router.get('/list', function (req, res, next) {
             user: req.decoded.user._id
         }
     }
+
     Transaction.getList(filters, limit, skip, sort, fields, includeTotal, function (err, result) {
         if (err) return res.json(err);
         return res.json({ ok: true, result: result });
@@ -55,7 +58,7 @@ router.post('/', async (req, res, next) => {
     //validation format
     var valErrors = [];
 
-    const { error } = validateTransaction(req.body);
+    const { error } = validation.validateTransaction(req.body);
     if (error) {
         error.details.map(function (err) {
             valErrors.push({ field: err.context.key, message: err.message });
@@ -113,15 +116,16 @@ router.delete('/:transaction_id', function (req, res, next) {
     });
 });
 
-function validateTransaction(transaction) {
-    const schema = {
-        event: Joi
-            .objectId()
-            .required(),
-        token: Joi
-            .string()
-    };
-    return Joi.validate(transaction, schema, { abortEarly: false });
-}
+
+// function validateTransaction(transaction) {
+//     const schema = {
+//         event: Joi
+//             .objectId()
+//             .required(),
+//         token: Joi
+//             .string()
+//     };
+//     return Joi.validate(transaction, schema, { abortEarly: false });
+// }
 
 module.exports = router;
