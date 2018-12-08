@@ -125,10 +125,6 @@ citySchema.statics.insertCity = function(city,cb){
         });    
 };
 
-
-
-
-
 //Update list of users (Add) when insert a new User
 citySchema.statics.insertUser = function(cityId,userId,cb){
     City.findOneAndUpdate({_id: cityId}, 
@@ -137,6 +133,18 @@ citySchema.statics.insertUser = function(cityId,userId,cb){
                  if (error) {
                     return cb({ code: 500, ok: false, message: 'error saving User'}); 
                  } else {
+                    return cb(null,success);
+                 }
+             });
+}
+//Update list of users (Delete) when Delete a User
+citySchema.statics.deleteUser = function(cityId,userId,cb){
+    City.findOneAndUpdate({_id: cityId}, 
+            { $pull: { users: userId }}, {safe: true, upsert: true},
+           function (error, success) {
+                 if (error) {
+                    return cb({ code: 400, ok: false, message: 'error_deleting_User'}); 
+                } else {
                     return cb(null,success);
                  }
              });
