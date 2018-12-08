@@ -178,6 +178,10 @@ router.post('/login', function (req, res, next) {
 router.post('/register', function (req, res, next) {
     User.createRecord(req.body, function (err, result) {
         if (err) return res.status(400).json(err);
+
+
+
+
         // user created
         if (result) {
             //TODO: specify id of the recover pass

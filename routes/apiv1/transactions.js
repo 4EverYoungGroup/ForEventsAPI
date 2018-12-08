@@ -107,11 +107,18 @@ router.get('/:transaction_id', function (req, res, next) {
 
 router.delete('/:transaction_id', function (req, res, next) {
 
-    Transaction.deleteRecord(req, function (err) {
+    Transaction.deleteRecord(req, function (err, result) {
         if (err) {
             return res.status(err.code).json({ ok: err.ok, message: err.message });
         }
         //transaction deleted
+        //delete transaction in event collection
+        Event.deleteTransaction(result.event, result._id, function (errDelete, resultDelete) {
+            if (errDelete) {
+                return res.status(errDelete.code).json({ ok: errDelete.ok, message: errDelete.message });
+            }
+        });
+
         return res.status(204).json({ ok: true, message: 'transaction_deleted' });
     });
 });

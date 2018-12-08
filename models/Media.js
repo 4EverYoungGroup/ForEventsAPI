@@ -223,7 +223,7 @@ mediaSchema.statics.deleteRecord = function (req, cb) {
             if (DeletedMedia.poster) {
                 return cb({ code: 400, ok: false, message: 'delete_not_allowed_mark_another_media_poster_true_previously' })
             }
-            DeletedMedia.remove(cb);
+            DeletedMedia.remove(cb(null, DeletedMedia));
         }
     })
 

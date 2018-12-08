@@ -46,7 +46,6 @@ transactionSchema.statics.createRecord = function (req, cb) {
 };
 
 transactionSchema.statics.deleteRecord = function (req, cb) {
-
     Transaction.findOne({ _id: req.params.transaction_id }, function (err, DeletedTransaction) {
         if (err) {
             return cb({ code: 500, ok: false, message: 'error_accesing_data' });
@@ -60,7 +59,7 @@ transactionSchema.statics.deleteRecord = function (req, cb) {
             if (DeletedTransaction.user != req.decoded.user._id && req.decoded.user.profile != 'Admin') {
                 return cb({ code: 403, ok: false, message: 'action_not_allowed_to_credentials_provided' })
             }
-            DeletedTransaction.remove(cb);
+            DeletedTransaction.remove(cb(null, DeletedTransaction));
         }
     })
 
@@ -101,7 +100,10 @@ transactionSchema.statics.getList = function (filters, limit, skip, sort, fields
         path: 'event', model: 'Event',
         populate: { path: 'media', model: 'Media' }
     });
-
+    query.populate({
+        path: 'event', model: 'Event',
+        populate: { path: 'event_type', model: 'Event_type' }
+    })
 
     return query.exec(function (err, rows) {
         if (err) return cb(err);

@@ -261,11 +261,18 @@ router.get('/:media_id', function (req, res, next) {
 
 router.delete('/:media_id', function (req, res, next) {
 
-    Media.deleteRecord(req, function (err) {
+    Media.deleteRecord(req, function (err, result) {
         if (err) {
             return res.status(err.code).json({ ok: err.ok, message: err.message });
         }
         //media deleted
+        //delete media in event collection
+        Event.deleteMedia(result.event, result._id, function (errDelete, resultDelete) {
+            if (errDelete) {
+                return res.status(errInsert.code).json({ ok: errDelete.ok, message: errDelete.message });
+            }
+        });
+
         return res.status(204).json({ ok: true, message: 'media_deleted' });
     });
 });
