@@ -121,6 +121,18 @@ eventSchema.statics.insertMedia = function(eventId,mediaId, cb){
              });
 }
 
+//Update list of Media (Delete) when delete a Media
+eventSchema.statics.deleteMedia = function(eventId,mediaId, cb){
+    Event.findOneAndUpdate({_id: eventId}, 
+            { $pull: { media: mediaId } },{safe: true, upsert: true},
+           function (error, success) {
+                 if (error) {
+                    return cb({ code: 400, ok: false, message: 'error deleting Media'}); 
+                 } else {
+                    return cb(null,success);
+                 }
+             });
+}
 
 // Insert a new User into Event Update list users
 eventSchema.statics.insertUser = function(eventId,userId, cb){
@@ -128,19 +140,45 @@ eventSchema.statics.insertUser = function(eventId,userId, cb){
             { $push: { users: userId} },
            function (error, success) {
                  if (error) {
-                    return cb({ code: 400, ok: false, message: 'error_saving_data'}); 
+                    return cb({ code: 400, ok: false, message: 'error saving User'}); 
                 } else {
                     return cb(null,success);
                  }
              });
 }
-// Insert a new Transaction into Event Update list transactions
+
+// Delete a User in Event. Update list users in Event
+eventSchema.statics.deleteUser = function(eventId,userId, cb){
+    Event.findOneAndUpdate({_id: eventId}, 
+            { $pull: { users: userId} },{safe: true, upsert: true},
+           function (error, success) {
+                 if (error) {
+                    return cb({ code: 400, ok: false, message: 'error deleting User'}); 
+                } else {
+                    return cb(null,success);
+                 }
+             });
+}
+
+// Insert a new Transaction in Event Update list transactions
 eventSchema.statics.insertTransaction = function(eventId, trasactionId, cb){
     Event.findOneAndUpdate({_id: eventId}, 
             { $push: { transactions: trasactionId} },
            function (error, success) {
                  if (error) {
-                    return cb({ code: 400, ok: false, message: 'error_saving_data'}); 
+                    return cb({ code: 400, ok: false, message: 'error saving Transaction'}); 
+                } else {
+                    return cb(null,success);
+                 }
+             });
+}
+// Delete a Transaction in Event. Update list transactions in Event
+eventSchema.statics.deleteTransaction = function(eventId, trasactionId, cb){
+    Event.findOneAndUpdate({_id: eventId}, 
+            { $pull: { transactions: trasactionId} },{safe: true, upsert: true},
+           function (error, success) {
+                 if (error) {
+                    return cb({ code: 400, ok: false, message: 'error deleting Transaction'}); 
                 } else {
                     return cb(null,success);
                  }
