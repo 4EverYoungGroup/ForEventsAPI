@@ -44,7 +44,7 @@ event_typeSchema.statics.event_typeExists= function(eventTypeId, cb){
     }
 };
 
-//Update list of events (Add) when insert a new Event_type
+//Update list of events (Add) when insert a new Event
 event_typeSchema.statics.insertEvent = function(event_typeId, eventId, cb){
     Event_type.findOneAndUpdate({_id: event_typeId}, 
             { $push: { events: eventId } },
@@ -57,13 +57,39 @@ event_typeSchema.statics.insertEvent = function(event_typeId, eventId, cb){
              });
 }
 
-//Update list of favorite_searches (Add) when insert a new Event_type
+//Update list of events (Delete) when delete a Event
+event_typeSchema.statics.deleteEvent = function(event_typeId, eventId, cb){
+    Event_type.findOneAndUpdate({_id: event_typeId}, 
+            { $pull: { events: eventId } }, {safe: true, upsert: true},
+           function (error, success) {
+                 if (error) {
+                    return cb({ code: 500, ok: false, message: 'error deleting event_type'}); 
+                } else {
+                    return cb(null,success);
+                 }
+             });
+}
+
+//Update list of favorite_searches (Add) when insert a new Favorite_Search
 event_typeSchema.statics.insertFavorite_Search = function(event_typeId,favorite_searchesId,cb){
     Event_type.findOneAndUpdate({_id: event_typeId}, 
             { $push: { favorite_searches: favorite_searchesId } },
            function (error, success) {
                  if (error) {
-                    return cb({ code: 500, ok: false, message: 'error saving event_type'}); 
+                    return cb({ code: 500, ok: false, message: 'error saving Favorite_Search'}); 
+                } else {
+                    return cb(null,success);
+                 }
+             });
+}
+
+//Update list of favorite_searches (Delete) when delete a Favorite_Search
+event_typeSchema.statics.deleteFavorite_Search = function(event_typeId,favorite_searchesId,cb){
+    Event_type.findOneAndUpdate({_id: event_typeId}, 
+            { $pull: { favorite_searches: favorite_searchesId } }, {safe: true, upsert: true},
+           function (error, success) {
+                 if (error) {
+                    return cb({ code: 500, ok: false, message: 'error deleting Favorite_Search'}); 
                 } else {
                     return cb(null,success);
                  }
