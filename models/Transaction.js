@@ -102,7 +102,7 @@ transactionSchema.statics.getList = function (filters, limit, skip, sort, fields
     });
     query.populate({
         path: 'event', model: 'Event',
-        populate: { path: 'event_type', model: 'Event_type' }
+        populate: { path: 'event_type', model: 'Event_type', select: '_id name' },
     })
 
     return query.exec(function (err, rows) {
