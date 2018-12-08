@@ -4,14 +4,10 @@ const mongoose = require('mongoose');
 const Event = require('./Event');
 const User = require('./User');
 
-const Joi = require('joi'); //validate data provided API
 const v = require('validator');
 const validation = require('../startup/validation');
+const constants = require('../constants/types');
 
-const MediaTypes = Object.freeze({
-    picture: 'picture',
-    video: 'video'
-});
 
 var Schema = mongoose.Schema;
 
@@ -21,11 +17,11 @@ const mediaSchema = mongoose.Schema({
     url: { type: String, index: true, required: true },
     event: { type: Schema.Types.ObjectId, ref: 'Event' },
     user: { type: Schema.Types.ObjectId, ref: 'User' },
-    media_type: { type: String, required: true, enum: Object.values(MediaTypes), index: true },
+    media_type: { type: String, required: true, enum: Object.values(constants.MediaTypes), index: true },
     poster: { type: Boolean, index: true, default: false }
 });
 
-Object.assign(mediaSchema.statics, { MediaTypes });
+//Object.assign(mediaSchema.statics, { constants.MediaTypes });
 
 /**
  * list of media types allowed
@@ -56,26 +52,24 @@ mediaSchema.statics.createRecord = function (req, cb) {
         return cb({ ok: false, errors: valErrors });
     }
 
-    if (req.body.media_type === MediaTypes.video) {  //only media picture can set poster to true
+    if (req.body.media_type === constants.MediaTypes.video) {  //only media picture can set poster to true
         req.body.poster = false;
     }
 
-
-
-    //create new media
+    //new Media
     const media = new Media({
         name: req.body.name,
         description: req.body.description || '',
         url: req.body.url,
-        media_type: MediaTypes[req.body.media_type],
+        media_type: constants.MediaTypes[req.body.media_type],
         event: req.body.event,
         user: req.decoded.user._id,
         poster: req.body.poster
     })
 
     //we have to unset the media picture with poster to true , only one media picture with poster to true
-    if (req.body.poster && req.body.media_type === MediaTypes.picture) {
-        Media.findOneAndUpdate({ event: req.body.event, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
+    if (req.body.poster && req.body.media_type === constants.MediaTypes.picture) {
+        Media.findOneAndUpdate({ event: req.body.event, poster: true, media_type: constants.MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
             if (err) {
                 return cb({ code: 500, ok: false, message: 'error_updating_previos_picture_poster' });
             }
@@ -130,8 +124,6 @@ mediaSchema.statics.getList = function (filters, limit, skip, sort, fields, incl
     query.skip(skip);
     query.sort(sort);
     query.select(fields);
-
-
 
     return query.exec(function (err, rows) {
         if (err) return cb(err);
@@ -193,13 +185,13 @@ mediaSchema.statics.updateRecord = function (req, cb) {
             updatedMedia.description = (typeof req.body.description !== 'undefined') ? req.body.description : updatedMedia.description;
             updatedMedia.url = (typeof req.body.url !== 'undefined') ? req.body.url : updatedMedia.url;
             updatedMedia.media_type = (typeof req.body.media_type !== 'undefined') ? req.body.media_type : updatedMedia.media_type;
-            if (req.body.media_type === MediaTypes.picture) {
+            if (req.body.media_type === constants.MediaTypes.picture) {
                 updatedMedia.poster = req.body.poster;
             } else {
                 updatedMedia.poster = false;
             }
-            if ((typeof req.body.poster !== 'undefined') && req.body.media_type === MediaTypes.picture && req.body.poster === 'true') {
-                Media.findOneAndUpdate({ event: updatedMedia.event, poster: true, media_type: MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
+            if ((typeof req.body.poster !== 'undefined') && req.body.media_type === constans.MediaTypes.picture && req.body.poster === 'true') {
+                Media.findOneAndUpdate({ event: updatedMedia.event, poster: true, media_type: constants.MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
                     if (err) {
                         return cb({ code: 500, ok: false, message: 'error_updating_previous_picture_poster' });
                     }

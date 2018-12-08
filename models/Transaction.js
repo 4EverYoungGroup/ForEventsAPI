@@ -16,7 +16,6 @@ const transactionSchema = Schema({
     create_date: { type: Date, default: Date.now, index: true },
     event: { type: Schema.Types.ObjectId, ref: 'Event', index: true },
     user: { type: Schema.Types.ObjectId, ref: 'User', index: true },
-
 });
 
 transactionSchema.statics.exists = function (idTransaction, cb) {
@@ -88,8 +87,6 @@ transactionSchema.statics.getRecord = function (req, cb) {
     })
 }
 
-// We create a static method to search for transactions
-// The search can be paged and ordered
 transactionSchema.statics.getList = function (filters, limit, skip, sort, fields, includeTotal, cb) {
 
     const query = Transaction.find(filters);
@@ -98,8 +95,12 @@ transactionSchema.statics.getList = function (filters, limit, skip, sort, fields
     query.sort(sort);
     query.select(fields);
 
-    query.populate('event');
+    //query.populate('event');
     query.populate('user');
+    query.populate({
+        path: 'event', model: 'Event',
+        populate: { path: 'media', model: 'Media' }
+    });
 
 
     return query.exec(function (err, rows) {
@@ -111,13 +112,12 @@ transactionSchema.statics.getList = function (filters, limit, skip, sort, fields
 
         if (!includeTotal) return cb(null, result);
 
-        // incluir propiedad total
         Transaction.count(filters, (err, total) => {
             if (err) return cb(err);
             result.total = total;
             return cb(null, result);
         });
-    })
+    });
 }
 
 //Create model

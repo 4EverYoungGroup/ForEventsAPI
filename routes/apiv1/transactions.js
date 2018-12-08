@@ -47,7 +47,7 @@ router.get('/list', function (req, res, next) {
 
     Transaction.getList(filters, limit, skip, sort, fields, includeTotal, function (err, result) {
         if (err) return res.json(err);
-        return res.json({ ok: true, result: result });
+        return res.json({ ok: true, result: result.rows, total: result.total });
     });
 
 });

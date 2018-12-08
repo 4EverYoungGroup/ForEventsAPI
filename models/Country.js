@@ -1,13 +1,11 @@
 'use strict';
 
 const mongoose = require('mongoose');
-
 var Schema = mongoose.Schema;
 
 const countrySchema = mongoose.Schema({
     name: { type: String, index: true },
 });
-
 
 countrySchema.statics.exists = function (idCountry, cb) {
     Country.findById(idCountry, function (err, country) {
