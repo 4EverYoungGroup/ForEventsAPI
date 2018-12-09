@@ -190,6 +190,7 @@ userSchema.statics.updateRecord = function (req, cb) {
             updatedUser.birthday_date = (typeof req.body.birthday_date !== 'undefined') ? req.body.birthday_date : updatedUser.birthday_date;
             updatedUser.gender = (typeof req.body.gender !== 'undefined') ? req.body.gender : updatedUser.gender;
             updatedUser.address = (typeof req.body.address !== 'undefined') ? req.body.address : updatedUser.address;
+            updatedUser.city = (typeof req.body.city !== 'undefined') ? req.body.city : updatedUser.city;
             updatedUser.zip_code = (typeof req.body.zip_code !== 'undefined') ? req.body.zip_code : updatedUser.zip_code;
             updatedUser.province = (typeof req.body.province !== 'undefined') ? req.body.province : updatedUser.province;
             updatedUser.country = (typeof req.body.country !== 'undefined') ? req.body.country : updatedUser.country;

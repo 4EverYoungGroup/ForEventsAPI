@@ -79,11 +79,11 @@ function validateUser(user) {
         mobile_number: Joi
             .string()
             .allow('')
-            .regex(/^[0-9]{11}$/),
+            .regex(/^[+0-9]{12}$/),
         phone_number: Joi
             .string()
             .allow('')
-            .regex(/^[0-9]{11}$/),
+            .regex(/^[+0-9]{12}$/),
         validatedEmail: Joi
             .boolean().truthy('true').falsy('false').insensitive(true),
         tokenFB: Joi
