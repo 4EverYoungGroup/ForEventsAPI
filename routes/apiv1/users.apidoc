@@ -82,8 +82,8 @@
  * @apiParam (body) {String="M","F"} [gender] Gender of user
  * @apiParam (body) {String} [idn] IDN of the user
  * @apiParam (body) {String {255}} [company_name] Company name of the user
- * @apiParam (body) {String {11}} [mobile_number] Mobile number of the user
- * @apiParam (body) {String {11}} [phone_number] Mobile number of the user
+ * @apiParam (body) {String {12}} [mobile_number] Mobile number of the user, include country code, for example +346101234512
+ * @apiParam (body) {String {12}} [phone_number] Phone number of the user, include country code, for example +349101234512
  *
  * @apiSuccess {Boolean} ok true
  * @apiSuccess {String} message  user_created
