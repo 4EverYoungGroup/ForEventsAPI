@@ -132,9 +132,6 @@ userSchema.statics.deleteRecord = function (req, cb) {
         }
     })
 
-    //TODO: Delete events associated
-
-    //TODO: Delete Favourite_searches
 }
 
 userSchema.statics.updateRecord = function (req, cb) {

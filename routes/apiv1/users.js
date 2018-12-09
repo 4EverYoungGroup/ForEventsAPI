@@ -6,6 +6,10 @@ const router = express.Router();
 //database
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const Event = mongoose.model('Event');
+const Favorite_search = mongoose.model('Favorite_search');
+
+
 
 //security
 const jwt = require('jsonwebtoken');
@@ -26,8 +30,6 @@ const constructSearchFilter = require('../../lib/utilitiesUsers');
 
 //constants
 const constants = require('../../constants/types');
-
-
 
 
 /**
@@ -180,11 +182,9 @@ router.post('/register', function (req, res, next) {
         if (err) return res.status(400).json(err);
 
 
-
-
         // user created
         if (result) {
-            //TODO: specify id of the recover pass
+            //TODO: specify id of the register pass
             var idRequest = 1234
 
             mailer.sendMail(req.body.email, idRequest, result, constants.TemplateTypes.register,
@@ -266,6 +266,8 @@ router.post('/recover', function (req, res, next) {
 //Auth with JWT - ***************
 
 router.use(jwtAuth());
+
+//TODO: Eliminar esta funcionalidad, solamente de ejmplo para Josep
 
 router.post('/notificate', function (req, res, next) {
 
@@ -363,7 +365,22 @@ router.delete('/:user_id', function (req, res, next) {
             return res.status(err.code).json({ ok: err.ok, message: err.message });
         }
         //user deleted
-        return res.status(204).json({ ok: true, message: 'user_deleted' });
+
+        //Delete events associated
+        Event.deleteMany({ organizer: req.params.user_id }, function (errDeleteEvent, resulDeleteEvent) {
+            if (errDeleteEvent) {
+                return res.status(500).json({ ok: false, message: errDeleteEvent.message });
+            }
+            //Delete Favourite_searches
+            Favorite_search.deleteMany({ user: req.params.user_id }, function (errDeleteFS, resulDeleteFS) {
+                if (errDeleteFS) {
+                    return res.status(500).json({ ok: false, message: errDeleteFS.message });
+                }
+                return res.status(204).json({ ok: true, message: 'user_deleted' });
+            });
+        });
+
+
     });
 });
 
