@@ -252,7 +252,6 @@ userSchema.statics.getList = function (filters, limit, skip, sort, fields, inclu
     query.skip(skip);
     query.sort(sort);
     query.select(fields);
-    query.populate('city');
 
     return query.exec(function (err, rows) {
         if (err) return cb(err);
