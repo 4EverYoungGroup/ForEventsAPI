@@ -35,7 +35,6 @@ var eventSchema = Schema({
     notification: {type: Schema.Types.ObjectId, ref: 'Delivery_note'},
     notified: {type: Boolean, index: true, default: false},
     active: Boolean,
-
     location: {
         type: { type: String},
         coordinates: [Number]
