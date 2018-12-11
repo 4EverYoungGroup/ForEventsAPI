@@ -32,6 +32,8 @@ var eventSchema = Schema({
     event_type: {type: Schema.Types.ObjectId, ref: 'Event_type'},
     transactions: [{type: Schema.Types.ObjectId, ref: 'Transaction'}],
     media: [{type: Schema.Types.ObjectId, ref: 'Media'}],
+    notification: {type: Schema.Types.ObjectId, ref: 'Delivery_note'},
+    notified: {type: Boolean, index: true, default: false},
     active: Boolean,
     location: {
         type: { type: String},

@@ -64,11 +64,19 @@ router.delete('/:id', async (req,res, next) =>{
     if (_id && admin){
         try{
             const exists = await User.userProfileS(admin, "Admin");
-            console.log('existe: '+ exists);
             if (exists === 1){
                 try{
-                    await Event_type.remove({_id: _id }).exec();
-                    return res.status(200).json({ ok: true, message: 'Event_deleted' });
+                    const idEventType = mongoose.Types.ObjectId(_id)
+                    
+                        const eventTypeExists = await Event.count({event_type: idEventType}).exec();
+                    
+                    if (eventTypeExists > 0){
+                        return res.status(400).json({ok: false, message: 'The Event_type has linked events'});
+                    }else{
+                        await Event_type.remove({_id: _id }).exec();
+                        return res.status(200).json({ ok: true, message: 'Event_deleted' });
+                    };
+                    
                 }catch (err){
                     res.status(400).json({ok: false, message: err});
                 }

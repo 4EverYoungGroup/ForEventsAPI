@@ -137,8 +137,25 @@ router.delete('/:id', async (req,res, next) =>{
             const exists = await User.userProfileS(organizer, profile);
             if (exists === 1){
                 try{
-                    await Event.deleteEvent({_id: _id });
-                    return res.status(200).json({ ok: true, message: 'Event_deleted' });
+                    const eventDelete = await Event.findOne({_id: _id}).exec();
+                    const eventId = _id;
+                    const event_typeId = eventDelete.event_type;
+                    if (eventId && event_typeId ){
+                        Event_type.event_typeExists(event_typeId.toString(), function (err, resultType){
+                            if (resultType === 1){
+                                Event_type.deleteEvent(event_typeId, eventId, async function(err, resultInsert){
+                                    if (err) return res.status(400).json({ok: false, result: err});
+                                    await Event.deleteEvent({_id: _id });
+                                    return res.status(200).json({ ok: true, message: 'Event_deleted' });
+                                });                          
+                            }else{
+                                return res.status(400).json({ok: false, message: 'Event_type not found'});
+                            };    
+                        });                   
+                    } else {
+                       return res.status(400).json({ok: false, message: 'Event_type not found'});
+                    }; 
+                   
                 }catch (err){
                     res.status(400).json({ok: false, message: err});
                 }
