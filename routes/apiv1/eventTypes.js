@@ -11,6 +11,14 @@ const User = require('../../models/User');
 const mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+/*//security
+const jwt = require('jsonwebtoken');
+const jwtAuth = require('../../lib/jwtAuth');
+
+//Auth with JWT
+router.use(jwtAuth());*/
+
+//req.decoded.user._id
 
 
 // Insert New event_type
@@ -24,7 +32,7 @@ router.post('/', (req,res,next) => {
         Event_type.insertEvent_type(event_type, function(err, result){
             if (err) return result.status(400).json({ok: false, message: 'Error Event_type_NOT_registered', err});
             // Event created
-            return res.status(200).json({ ok: true, message: 'Event_type_registered', data: result });
+            return res.status(201).json({ ok: true, message: 'Event_type_registered', data: result });
         });   
     };
 });
@@ -81,14 +89,14 @@ router.delete('/:id', async (req,res, next) =>{
                     res.status(400).json({ok: false, message: err});
                 }
             }else {
-                res.status(400).json({ok: false, message: 'Unauthorized user to manage events'});
+                res.status(403).json({ok: false, message: 'Unauthorized user to manage events'});
             };
         }catch(err){
 
-            res.status(400).json({ok: false, message: 'Unauthorized user or profile'});
+            res.status(403).json({ok: false, message: 'Unauthorized user or profile'});
         }
     }else{
-    res.status(400).json({ok: false, message: 'Incomplete data'});
+    res.status(404).json({ok: false, message: 'Incomplete data'});
 };
     
 });
