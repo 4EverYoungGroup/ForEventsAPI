@@ -1,0 +1,288 @@
+/**
+ * @api {get} /transactions/list get list
+ * @apiversion 1.0.0
+ * @apidescription This endpoint allow to recover the full list of transactions associated to the user specified in the token used to access
+ * 
+ * Restrictions:
+ * * Only authenticated users can do this action
+ * * Only can be listed the transactions of the user_id especifed in the token access
+ *
+ * @apiName get list
+ * @apiGroup Transaction
+ * @apiPermission authenticated_token_required: You must provide 'token' authorized in the querystring, body or header 'x-access-token'
+ *
+ * @apiParam (params) {String} [user] If you are an Admin you can obtain the transaction of any user specifying the object_id of the user desired 
+ * @apiParam (params) {Number} [skip] Used to paginate result, number of pages you skip in the result obtained. By default 0
+ * @apiParam (params) {Number} [limit] Number of result per page. By default 100
+ * @apiParam (params) {String} [sort] Select the name of field to order, for example 'name'. If your use the sign - before the name of the field you sort in inverted order
+ * @apiParam (params) {Boolean} [includeTotal] You can set to true if you want to obtain also the total number of registered recovered
+ * @apiParam (params) {String} [fields] You can define the name of fields you want to recover from the databae. You must specify them separating them with spaces. Example 'name description url'
+ *  
+ * @apiSuccess {Boolean} ok true
+ * @apiSuccess {String} result array transactions
+ * @apiSuccess {Object} rows JSON Object with the transction associated to user
+ *
+ * @apiSuccessExample Success-Response:
+ *  HTTP/1.1 200 Created
+ *{
+ *   "ok": true,
+ *   "result": [
+ *       {
+ *           "_id": "5c0c278adc3dde4200eb9234",
+ *           "create_date": "2018-12-08T20:20:26.576Z",
+ *           "event": {
+ *               "location": {
+ *                   "coordinates": [
+ *                       -5.748529,
+ *                       41.513958
+ *                   ],
+ *                   "type": "Point"
+ *               },
+ *               "users": [],
+ *               "transactions": [
+ *                   "5c0c278adc3dde4200eb9234"
+ *               ],
+ *               "media": [
+ *                   {
+ *                       "poster": false,
+ *                       "_id": "5c0ba11ae16f267c890cf5f3",
+ *                       "name": "Cumpleaños",
+ *                       "description": "",
+ *                       "url": "https://firebasestorage.googleapis.com/v0/b/forevents-3a85b.appspot.com/o/images%2F1543758968269_Events_get_Consulta%20de%20Eventos.png?alt=media&token=5191f146-4008-427e-85d5-3893bd99325c",
+ *                       "media_type": "picture",
+ *                       "event": "5bf860bcc9042e0eedecae4d",
+ *                       "user": "5bedd86ca2b814bafbadf7c9",
+ *                       "__v": 0
+ *                   }
+ *               ],
+ *               "_id": "5bf860bcc9042e0eedecae4d",
+ *               "begin_date": "2018-12-22T11:30:00.000Z",
+ *               "end_date": "2018-12-31T14:45:15.000Z",
+ *               "address": "Calle San Blas, 15",
+ *               "zip_code": "49023",
+ *               "city": "Zamora",
+ *               "province": "Zamora",
+ *               "country": "spain",
+ *               "indoor": false,
+ *               "max_visitors": 500,
+ *               "free": true,
+ *               "price": 0,
+ *               "min_age": 0,
+ *               "name": "Fiestas de caracol",
+ *               "description": "Carrera de caracoles en plaza Mayor 3ª ronda",
+ *               "organizer": "5bf838dc6d8e34f5f12b341d",
+ *               "event_type": {
+ *                   "_id": "5bf86080c9042e0eedecae4c",
+ *                   "name": "Atletismo"
+ *               },
+ *               "active": true,
+ *               "create_date": "2018-11-23T20:19:08.149Z",
+ *               "__v": 0
+ *           },
+ *           "user": {
+ *               "profile": "User",
+ *               "favorite_searches": [],
+ *               "transactions": [],
+ *               "events": [],
+ *               "validatedEmail": true,
+ *               "tokensFB": [
+ *                   "AAAAaXfomec:APA91bFX8EaL2A8BkDrmztRbkcg_PFAMQY1CtObe0BiywhA_nikfwmMLltCO1ipHaciF9TgMVMTdZoQkjZffRWC-9_8H-lskMkykPVQr8GrUJrqp1aowe7_MIW_dydODRh12TlXEhq6X",
+ *                   "BAAAaXfomec:APA91bFX8EaL2A8BkDrmztRbkcg_PFAMQY1CtObe0BiywhA_nikfwmMLltCO1ipHaciF9TgMVMTdZoQkjZffRWC-9_8H-lskMkykPVQr8GrUJrqp1aowe7_MIW_dydODRh12TlXEhq6X"
+ *               ],
+ *               "_id": "5bfa701cc3d2ae826e4ebc55",
+ *               "email": "user@gmail.com",
+ *               "first_name": "Johann",
+ *               "last_name": "",
+ *               "alias": "",
+ *               "address": "Calle Aguilucho",
+ *               "password": "b17e1e0450dac425ea318253f6f852972d69731d6c7499c001468b695b6da219",
+ *               "province": "ÁLAVA",
+ *               "country": "",
+ *               "create_date": "2018-11-25T09:49:16.215Z",
+ *               "delete_date": null,
+ *               "__v": 23,
+ *               "city": "5bf4c17ba35d947902962eb3"
+ *           }
+ *       }
+ *   ],
+ *   "total": 2
+ *}
+ *
+ * @apiError action_not_allowed_to_credentials_provided If you are trying the transactions of an user and you are not an Admin
+ * @apiError event_not_exists Event doesn't exist
+ * @apiErrorExample Error-Response:
+ * 
+ *     HTTP/1.1 500 Server Error
+ *     {
+ *       "ok": false
+ *       "message": "error_accesing_data"
+ *     }
+ * 
+ *     HTTP/1.1 403 Forbidden
+ *     {
+ *       "ok": false
+ *       "message": "action_not_allowed_credentials_error"
+ *     }
+ * 
+ */
+
+
+ /**
+ *
+ * @api {post} /transactions/ post
+ * @apiversion 1.0.0
+ * @apidescription This endpoint allow user to register transactions (subcriptions to an event). Your id user is registed with the transactions and it's extracted from your token
+ * @apiName post
+ * @apiGroup Transaction
+ * @apiPermission authenticated_token_required: You must provide 'token' authorized in the querystring, body or header 'x-access-token'.
+ *
+ * @apiParam (body) {String} event id of Event associated to the media file
+ * 
+ *
+ * @apiSuccess {Boolean} ok true
+ * @apiSuccess {String} message "transaction_registered"
+ * @apiSuccess {Object} data { object transaction recently stored }
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *       {
+ *            "ok": true,
+ *            "message": "transaction_registered",
+ *            "data": {
+ *                      "_id": "5c101895a0abb05588646b84",
+ *                      "create_date": "2018-12-11T20:05:41.294Z",
+ *                      "event": "5bf860bcc9042e0eedecae4d",
+ *                      "user": "5bfa701cc3d2ae826e4ebc55",
+ *                      "__v": 0
+ *                    }
+ *       }
+ *
+ * @apiError event_id_must_be_provided must provide event_id valid
+ * @apiError event_not_exists event_id not found in database
+ * @apiError user_not_exists user_id not found in database
+ * @apiError user_already_registered_for_event If the user is already registered for the event
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *       "ok": false
+ *       "message": "event_not_exist"
+ *     }    
+ *
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *       "ok": false
+ *       "message": "user_not_exist"
+ *     }  
+ * 
+ *     HTTP/1.1 403 Forbidden
+ *     {
+ *       "ok": false
+ *       "message": "action_not_allowed_credentials_error"
+ *     }
+ */
+
+
+  /**
+ * @api {get} /transactions/:transaction_id get
+ * @apiversion 1.0.0
+ * @apidescription This endpoint allow to recover the information about a transaction registered in the system
+ * 
+ * Restrictions:
+ * * Only authenticated users can do this action
+ *
+ * @apiName get
+ * @apiGroup Transaction
+ * @apiPermission authenticated_token_required: You must provide 'token' authorized in the querystring, body or header 'x-access-token'
+ *
+ * @apiParam (querysting) {String} transaction_id Id of Transaction, object Id of MongoDB database
+ *
+ * @apiSuccess {Boolean} ok true
+ * @apiSuccess {String} message  transaction_info
+ * @apiSuccess {Object} transaction JSON Object with the data of the transaction consulted
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 
+ *       {
+ *         "ok": true,
+ *         "message": "transaction_info",
+ *         "data": {
+ *                      "_id": "5c101895a0abb05588646b84",
+ *                      "create_date": "2018-12-11T20:05:41.294Z",
+ *                      "event": "5bf860bcc9042e0eedecae4d",
+ *                      "user": "5bfa701cc3d2ae826e4ebc55",
+ *                      "__v": 0
+ *                    }
+ *       }
+ *
+ * @apiError transaction_not_exists transaction_id not found in database
+ * @apiError action_not_allowed_credentials_error The trying to obtain info about the transction is not user that created it or user is not an Admin
+ * @apiErrorExample Error-Response:
+ * 
+ *     HTTP/1.1 500 Server Error
+ *     {
+ *       "ok": false
+ *       "message": "error_accesing_data"
+ *     }
+ * 
+ *     HTTP/1.1 404 Not found
+ *     {
+ *       "ok": false
+ *       "message": "transaction_not_exist"
+ *     }
+ *     HTTP/1.1 403 Forbidden
+ *     {
+ *       "ok": false
+ *       "message": "action_not_allowed_credentials_error"
+ *     }
+ */
+
+
+
+ /**
+ *
+ * @api {delete} /transactions/:transaction_id delete
+ * @apiversion 1.0.0
+ * @apidescription This endpoint allows user to delete registration of the an user to an event
+ *
+ *  Restrictions:
+ * * Only an user with role of Administrator or owner of the transaction (subcription) can do this action
+ * 
+ * @apiName delete
+ * @apiGroup Transaction
+ * @apiPermission authenticated_token_required: You must provide 'token' authorized in the querystring, body or header 'x-access-token'
+ *
+ * @apiParam (params) {String} transaction_id Id of Transaction, object Id of MongoDB database
+ *
+ * @apiSuccess {Boolean} ok true
+ * @apiSuccess {String} message transaction_deleted
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 204 No content
+ *   
+ *
+ * @apiError transaction_not_exist The transacction_id not exists in database
+ * @apiError error_accesing_data Error undefined accesing data
+ * @apiError action_not_allowed_to_credentials_provided If the user trying to do the action is not the owner of the transaction or and Administrator
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Server Error
+ *     {
+ *       "ok": false
+ *       "message": "error_accesing_data"
+ *     }
+ * 
+ *     HTTP/1.1 404 Not found
+ *     {
+ *       "ok": false
+ *       "message": "transaction_not_exist"
+ *     }
+ * 
+ *     HTTP/1.1 403 Forbidden
+ *     {
+ *       "ok": false
+ *       "message": "action_not_allowed_to_credentials_provided"
+ *     }
+ */
+
+
+ 

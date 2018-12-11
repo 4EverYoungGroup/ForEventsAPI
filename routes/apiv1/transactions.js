@@ -21,6 +21,12 @@ const jwtAuth = require('../../lib/jwtAuth');
 //Auth with JWT
 router.use(jwtAuth());
 
+
+/**********************/
+/****** GET LIST ******/
+/**********************/
+
+
 router.get('/list', function (req, res, next) {
 
     const skip = parseInt(req.query.skip) || 0;
@@ -52,6 +58,11 @@ router.get('/list', function (req, res, next) {
 
 });
 
+
+
+/******************/
+/****** POST ******/
+/******************/
 
 router.post('/', async (req, res, next) => {
 
@@ -105,6 +116,11 @@ router.get('/:transaction_id', function (req, res, next) {
 });
 
 
+
+/********************/
+/****** DELETE ******/
+/********************/
+
 router.delete('/:transaction_id', function (req, res, next) {
 
     Transaction.deleteRecord(req, function (err, result) {
@@ -123,16 +139,5 @@ router.delete('/:transaction_id', function (req, res, next) {
     });
 });
 
-
-// function validateTransaction(transaction) {
-//     const schema = {
-//         event: Joi
-//             .objectId()
-//             .required(),
-//         token: Joi
-//             .string()
-//     };
-//     return Joi.validate(transaction, schema, { abortEarly: false });
-// }
 
 module.exports = router;

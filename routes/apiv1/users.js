@@ -147,17 +147,21 @@ router.post('/notificate', function (req, res, next) {
         },
         notification: {
             title: "4Events: Nuevo evento registrado",
-            icon: "ic_launcher",
+            //icon: "ic_launcher",
             body: "Hemos encontrado un nuevo evento que puede ser de tu agrado. " + currentDate.getDate()
         }
     };
 
     //TODO: eliminar estas lineas
     //armando
+    //const token_fbArmando = 'eLM7ZeTEkwA:APA91bETqgO6VJLVGlOHm1g03oWOcQfYSzFxu5huYW46q8eoV4wH8NSZpCRNPLSJO-wkKrcL968Jpu2uoqw0EIPITtSzpHgwYBvwWtPfQnb6-YlGCQ5k4woyoVCvNddyXUMOWI_IIOFA';
     const token_fbArmando = 'eLM7ZeTEkwA:APA91bETqgO6VJLVGlOHm1g03oWOcQfYSzFxu5huYW46q8eoV4wH8NSZpCRNPLSJO-wkKrcL968Jpu2uoqw0EIPITtSzpHgwYBvwWtPfQnb6-YlGCQ5k4woyoVCvNddyXUMOWI_IIOFA';
 
     //luis
-    const token_fbLuis = 'dRr4_uFzv4o:APA91bHNCPA0X83hlvBUAJTpG5zR3pl_K9uJ4Qa05u-LJyicTFaSiCvYfeJG4gTIhGlHf61Y8NM4JXH_YjXeXa3fBWU6I2GFTTcD_c0a7-hL65_QeUCydTLlLgYYdku5VXe5cm0XHoj7';
+    //    const token_fbLuis = 'eS4A6x2MCGE:APA91bGOzjfOdT568XS1WchhswdHFELXqslqUzH9OWmjPUwvzrhBaqs65u1i_DALr_XClPYJjnJ2Yt0Gn1_qHGROKoPKMYO6zwaHNw37ww3VbxjJtbaCexaTv4RhAsA04YGyuw1EX8eI';
+
+    const token_fbLuis = 'dxhZJZu0OoY:APA91bH8nDJvC4wrW9FEd4ubCqDZYccVLiFqwbLDUejHZAgbFiryO9vkvrp_Ct8C95eY9b6avutysUENSlmainjudvuuPLKnTaWQfvVFQmp7mRyrqMV1kYC_ouBCYvoISpPJ5wpsuHu0';
+
 
     const tokens_fb = [token_fbLuis, token_fbArmando];
 

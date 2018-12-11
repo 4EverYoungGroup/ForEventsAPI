@@ -190,7 +190,7 @@ mediaSchema.statics.updateRecord = function (req, cb) {
             } else {
                 updatedMedia.poster = false;
             }
-            if ((typeof req.body.poster !== 'undefined') && req.body.media_type === constans.MediaTypes.picture && req.body.poster === 'true') {
+            if ((typeof req.body.poster !== 'undefined') && req.body.media_type === constants.MediaTypes.picture && req.body.poster === 'true') {
                 Media.findOneAndUpdate({ event: updatedMedia.event, poster: true, media_type: constants.MediaTypes.picture }, { $set: { poster: false } }, function (err, doc) {
                     if (err) {
                         return cb({ code: 500, ok: false, message: 'error_updating_previous_picture_poster' });
