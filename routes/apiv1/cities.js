@@ -10,6 +10,16 @@ const City = require('../../models/City');
 const mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+/*//security
+const jwt = require('jsonwebtoken');
+const jwtAuth = require('../../lib/jwtAuth');
+
+//Auth with JWT
+router.use(jwtAuth());*/
+
+//req.decoded.user._id
+
+
 
 //List of cities
 router.get('/', async (req, res, next) => {

@@ -12,6 +12,16 @@ const mainUpdate = require('../../lib/updateEvents');
 const Event_type = require('../../models/Event_type');
 var Schema = mongoose.Schema;
 
+
+/*//security
+const jwt = require('jsonwebtoken');
+const jwtAuth = require('../../lib/jwtAuth');
+
+//Auth with JWT
+router.use(jwtAuth());*/
+
+//req.decoded.user._id
+
 //List all events
 router.get('/', async (req, res, next) => {
     try{
@@ -47,7 +57,7 @@ router.get('/', async (req, res, next) => {
             if (result){
                 filter.event_type = result._id;
             } else{
-                res.status(400).json({ok: false, message: 'Event Type not found'});
+                res.status(404).json({ok: false, message: 'Event Type not found'});
             };
             
         };
@@ -93,20 +103,20 @@ router.post('/', async(req,res,next) => {
                         Event_type.insertEvent(event_typeId, eventId, function(err, resultInsert){
                             if (err) return res.status(400).json({ok: false, result: err});
 
-                            return res.status(200).json({ ok: true, message: 'Event_registered', data: result});
+                            return res.status(201).json({ ok: true, message: 'Event_registered', data: result});
                         });
                        
                     }else{
-                        return res.status(400).json({ok: false, message: 'Event_type not found'});
+                        return res.status(404).json({ok: false, message: 'Event_type not found'});
                     };    
                 });
                 
                 } else {
-                   return res.status(400).json({ok: false, message: 'Event_type not found'});
+                   return res.status(404).json({ok: false, message: 'Event_type not found'});
                 };       
            });
         }else{
-            return res.status(400).json({ok: false, message: 'Unauthorized user to manage events'});
+            return res.status(403).json({ok: false, message: 'Unauthorized user to manage events'});
         };
        };
   });
@@ -146,27 +156,27 @@ router.delete('/:id', async (req,res, next) =>{
                                 Event_type.deleteEvent(event_typeId, eventId, async function(err, resultInsert){
                                     if (err) return res.status(400).json({ok: false, result: err});
                                     await Event.deleteEvent({_id: _id });
-                                    return res.status(200).json({ ok: true, message: 'Event_deleted' });
+                                    return res.status(204).json({ ok: true, message: 'Event_deleted' });
                                 });                          
                             }else{
-                                return res.status(400).json({ok: false, message: 'Event_type not found'});
+                                return res.status(404).json({ok: false, message: 'Event_type not found'});
                             };    
                         });                   
                     } else {
-                       return res.status(400).json({ok: false, message: 'Event_type not found'});
+                       return res.status(404).json({ok: false, message: 'Event_type not found'});
                     }; 
                    
                 }catch (err){
                     res.status(400).json({ok: false, message: err});
                 }
             }else {
-                res.status(400).json({ok: false, message: 'Unauthorized user to manage events'});
+                res.status(403).json({ok: false, message: 'Unauthorized user to manage events'});
             };
         }catch(err){
-            res.status(400).json({ok: false, message: 'Unauthorized user or profile'});
+            res.status(403).json({ok: false, message: 'Unauthorized user or profile'});
         }
     }else{
-    res.status(400).json({ok: false, message: 'Incomplete data'});
+    res.status(404).json({ok: false, message: 'Incomplete data'});
 };
     
 });

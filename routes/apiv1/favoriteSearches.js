@@ -11,6 +11,15 @@ const Favorite_search = require('../../models/Favorite_search');
 
 var Schema = mongoose.Schema;
 
+/*//security
+const jwt = require('jsonwebtoken');
+const jwtAuth = require('../../lib/jwtAuth');
+
+//Auth with JWT
+router.use(jwtAuth());*/
+
+//req.decoded.user._id
+
 //List all events
 router.get('/', async (req, res, next) => {
     try{
@@ -26,7 +35,7 @@ router.get('/', async (req, res, next) => {
             } 
             
         }else{
-            res.status(400).json({ok: false, result: "User is required"});
+            res.status(404).json({ok: false, result: "User is required"});
         }
 
         const limit = parseInt(req.query.limit);
@@ -72,7 +81,7 @@ router.post('/', async(req,res,next) => {
             //Insert Favorite_search in User
             User.insertFavorite_search(result.user,result._id, function(err, result2){
                 if (err){return cb({ code: 400, ok: false, message: 'error saving Favorite_search in User' + err});};
-                return res.status(200).json({ ok: true, message: 'Event_registered', data: result});
+                return res.status(201).json({ ok: true, message: 'Event_registered', data: result});
             });
             //console.log(JSON.parse(result.query))   
         });
@@ -92,7 +101,7 @@ router.delete('/:id', async (req,res, next) =>{
         User.deleteFavorite_search(userId,_id, function(err, result2){
             if (err){return res.status(400).json({ code: 400, ok: false, message: 'error deleting Favorite_search in User' + err});};
            
-            return res.status(200).json({ ok: true, message: 'Event_deleted' }); 
+            return res.status(204).json({ ok: true, message: 'Event_deleted' }); 
         });
         
         await Favorite_search.deleteFavorite_Search({_id });
